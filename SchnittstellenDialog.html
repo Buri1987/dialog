@@ -1,5 +1,6 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 <body>
 <div class="grid-container2">
@@ -11,6 +12,8 @@
         <button id="bgButton2" onclick="setSys2('2500<br>Leistungs-Leistungs-übertragungsanalgen')">Bg ändern</button>
     </div>
     <div class="rand">
+    <svg id="svgArtboard" width=100% height=100%>
+        </svg>
         <div id="linkesSystem" class="system sysZugeordnet">
             <div id="sys1Beschreibung" class="sysBeschreibung">
                 2472<br>Propellermotoren für Hauptantrieb
@@ -34,6 +37,27 @@
 </body>
 
 <style>
+html, body {
+ margin: 0 
+}
+
+.dragging {
+  opacity: 0.5;
+  background-color: blue;
+}
+
+.dropzone {
+  width: 200px;
+  height: 20px;
+  background: blueviolet;
+  margin: 10px;
+  padding: 10px;
+}
+
+.dragover {
+  background-color: puple;
+}
+
 body{
     background: white;
 }
@@ -289,7 +313,7 @@ body{
     var anzahlPortsLinks = 0;
     function portHinzufuegenLinks(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" ondrag="lineDragAni(event)" class="port"></div>'+
+        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" ondrag="lineDragAni(event)" class="port portLinks"></div>'+
                     '<div id="portBeschriftung1'+anzahlPortsLinks+'" class="portBeschriftung portBeschriftungLinks">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -314,11 +338,12 @@ body{
             } 
         }
         anzahlPortsLinks++;
+        init();
     }
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" ondrag="lineDragAni(event)" draggable="true" class="port"></div>'+
+        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" ondrag="lineDragAni(event)" draggable="true" class="port portRechts"></div>'+
                     '<div id="portBeschriftung2'+anzahlPortsRechts+'" class="portBeschriftung portBeschriftungRechts">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -343,6 +368,7 @@ body{
             } 
         }
         anzahlPortsRechts++;
+        init();
     }
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
@@ -410,6 +436,119 @@ body{
         top.window.postMessage({getPorts: [urlParams.get('nr'),urlParams.get('sys')]}, '*');
     }
 
+    
+    //Anteil Lennard SVG Linie zeichnen
+    
+    let svgArtboard = document.querySelector('#svgArtboard');
+    let startPoint = svgArtboard.createSVGPoint();
+    let endPoint = svgArtboard.createSVGPoint();
+    var source;
+    var target;
+
+    function init(){
+    	var sources = document.body.getElementsByClassName("portLinks");
+    	for(let i = 0; i < sources.length; i++){
+    		// events fired on the draggable target
+    		source = sources[i];
+    		source.addEventListener("drag", (event) => {
+    			console.log(event);
+    			drawSVGLine(event);
+    		  console.log("dragging");
+    		});
+
+    		source.addEventListener("dragstart", (event) => {
+    		  // store a ref. on the dragged elem
+    		  dragged = event.target;
+    		  // make it half transparent
+    		  event.target.classList.add("dragging");
+    		  console.log("added dragging");
+    		});
+
+    		source.addEventListener("dragend", (event) => {
+    		  // reset the transparency
+    		  event.target.classList.remove("dragging");
+    		  console.log("removed dragging");
+    		});
+    	}
+    	var targets = document.body.getElementsByClassName("portRechts");
+    	for(let i = 0; i < targets.length; i++){
+    		// events fired on the drop targets
+    		target = targets[i];
+    		console.log("add droptarget");
+    		target.addEventListener("dragover",  (event) => {
+    		    // prevent default to allow drop
+    		    event.preventDefault();
+    		  },false);
+
+    		target.addEventListener("dragenter", (event) => {
+    			console.log("dragenter vor if");
+    		  // highlight potential drop target when the draggable element enters it
+    		  console.log(event.target);
+    		  if (event.target.classList.contains("portRechts")) {
+    		    event.target.classList.add("dragover");
+    		    console.log("dragenter");
+    		  }
+    		});
+
+    		target.addEventListener("dragleave", (event) => {
+    		  // reset background of potential drop target when the draggable element leaves it
+    		  if (event.target.classList.contains("portRechts")) {
+    		    event.target.classList.remove("dragover");
+    		    console.log("dragleave");
+    		  }
+    		});
+
+    		target.addEventListener("drop", (event) => {
+    		  // prevent default action (open as link for some elements)
+    		  event.preventDefault();
+    		  // move dragged element to the selected drop target
+    		  if (event.target.classList.contains("portRechts")) {
+    		    event.target.classList.remove("dragover");
+    		    console.log("drop");
+    		  }
+    		});
+    	}
+    }
+
+    init();
+
+    function drawSVGLine(event){
+    	var svgLinie = document.getElementById(event.srcElement.attributes.id.value + 'Linie');
+    	var svgLinieName;
+    	if(!svgLinie){
+    		svgLinieName = event.srcElement.attributes.id.value + 'Linie';
+    		d3.select("#svgArtboard").append("line")
+            .style("stroke", "black")
+            .style("stroke-width", 3)
+            .attr("id", svgLinieName)
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", 0)
+            .attr("y2", 0); ;
+    	}
+    	
+    	var rect = event.srcElement.getBoundingClientRect();
+    	let xCoord = Math.round(((rect.right - rect.left) / 2 ) + rect.left);
+    	let yCoord = Math.round(((rect.bottom - rect.top) / 2 ) + rect.top);
+    	startPoint.x = xCoord;
+    	startPoint.y = yCoord;
+    	endPoint.x = event.clientX;
+    	endPoint.y = event.clientY;
+    	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
+    	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
+    	//let neueLinie = document.querySelector('#newLine');
+    	var neueLinie = document.getElementById(event.srcElement.attributes.id.value + 'Linie');
+    	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
+    	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
+    	neueLinie.setAttribute("x2", Math.round(svgEndPoint.x));
+    	neueLinie.setAttribute("y2", Math.round(svgEndPoint.y));
+    	console.log(svgStartPoint);
+    	console.log(svgEndPoint);
+    	console.log(xCoord, yCoord);
+    	console.log(event.screenX,event.screenY);
+    }
+
+    let dragged;
 
    
 
