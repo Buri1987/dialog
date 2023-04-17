@@ -444,15 +444,15 @@ body{
     /*                                                  */
     /****************************************************/
 
-    const port = getElementByID("port11");
-    const trash = document.getElementById("trash");
+    //const port = getElementByID("port11");
+  //const trash = document.getElementById("trash");
     
 
-    port.addEventListener("dragstart",function(ereignis){
+    /*port.addEventListener("dragstart",function(ereignis){
         trash.classList.remove("unsichtbar");
         ereignis.dataTransfer.setData("text/plain", ereignis.target.id);
-    });
-
+    });*/
+/*
     trash.addEventListener("dragover",function(ereignis){
         ereignis.preventDefault();
         ereignis.dataTransfer.dropEffect = "move";
@@ -464,7 +464,7 @@ body{
         const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
         const gezogenesElement = document.getElementById(ausgeleseneID);
         gezogenesElement.remove;
-    });
+    });*/
 
     
     //Anteil Lennard SVG Linie zeichnen
@@ -487,6 +487,8 @@ body{
     		});
 
     		source.addEventListener("dragstart", (event) => {
+                trash.classList.remove("unsichtbar");
+                event.dataTransfer.setData("text/plain", event.target.id);
     		  // store a ref. on the dragged elem
     		  dragged = event.target;
     		  // make it half transparent
@@ -500,6 +502,21 @@ body{
     		  console.log("removed dragging");
     		});
     	}
+
+        var trash = document.getElementById("trash");
+        trash.addEventListener("dragover",function(ereignis){
+            ereignis.preventDefault();
+            ereignis.dataTransfer.dropEffect = "move";
+        });
+    
+        trash.addEventListener("drop",function(ereignis){
+            ereignis.preventDefault;
+            trash.classList.add("unsichtbar");
+            const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
+            const gezogenesElement = document.getElementById(ausgeleseneID);
+            gezogenesElement.remove();
+        });
+
     	var targets = document.body.getElementsByClassName("portRechts");
     	for(let i = 0; i < targets.length; i++){
     		// events fired on the drop targets
