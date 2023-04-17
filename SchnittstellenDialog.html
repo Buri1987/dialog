@@ -16,6 +16,7 @@
                 2472<br>Propellermotoren für Hauptantrieb
             </div>
             <div id="portContainerLinks" class="portContainer">
+                <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
             </div>
             <img src="plus.png" onclick="portHinzufuegenLinks()">
             
@@ -277,6 +278,7 @@ body{
     
     const urlParams = new URLSearchParams(window.location.search);
     
+    
     if(urlParams.has('sys')){
         document.getElementById("sys1Beschreibung").innerHTML = urlParams.get('nr') + "<br>" + urlParams.get('sys');
     }
@@ -407,6 +409,33 @@ body{
     function portsAbfragen(){
         top.window.postMessage({getPorts: [urlParams.get('nr'),urlParams.get('sys')]}, '*');
     }
+
+    /****************************************************/
+    /*                  PortsToTrash                    */
+    /*                                                  */
+    /****************************************************/
+
+    const port = getElementByID("port11");
+    const trash = document.getElementById("trash");
+    
+
+    port.addEventListener("dragstart",function(ereignis){
+        trash.classList.remove("unsichtbar");
+        ereignis.dataTransfer.setData("text/plain", ereignis.target.id);
+    });
+
+    trash.addEventListener("dragover",function(ereignis){
+        ereignis.preventDefault();
+        ereignis.dataTransfer.dropEffect = "move";
+    });
+
+    trash.addEventListener("drop",function(ereignis){
+        ereignis.preventDefault;
+        trash.classList.add("unsichtbar");
+        const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
+        const gezogenesElement = document.getElementById(ausgeleseneID);
+        gezogenesElement.remove;
+    });
 
 
    
