@@ -313,7 +313,7 @@ body{
     var anzahlPortsLinks = 0;
     function portHinzufuegenLinks(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" ondrag="lineDragAni(event)" class="port portLinks"></div>'+
+        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" class="port portLinks"></div>'+
                     '<div id="portBeschriftung1'+anzahlPortsLinks+'" class="portBeschriftung portBeschriftungLinks">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -343,7 +343,7 @@ body{
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" ondrag="lineDragAni(event)" draggable="true" class="port portRechts"></div>'+
+        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts"></div>'+
                     '<div id="portBeschriftung2'+anzahlPortsRechts+'" class="portBeschriftung portBeschriftungRechts">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -383,14 +383,14 @@ body{
         document.getElementById('rechtesSystem').innerHTML = htmlCode;                
     }
 
-    function lineDragAni(event){
+    /*function lineDragAni(event){
         //console.log(event);
         zeichneLinie(event.x, event.y)
-    }
+    }*/
 
     var c = document.getElementById("canvasConnectoren");
     var ctx = c.getContext("2d");
-
+/*
     function zeichneLinie(x,y){
         ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         ctx.beginPath();
@@ -398,7 +398,7 @@ body{
         ctx.lineTo(xUmrechnen(x-c.getBoundingClientRect().x), yUmrechnen(y-c.getBoundingClientRect().y));
         ctx.stroke();
     }
-
+*/
     function xUmrechnen(x){
         return x*ctx.canvas.width/c.clientWidth;
     }
@@ -504,19 +504,39 @@ body{
     		  // move dragged element to the selected drop target
     		  if (event.target.classList.contains("portRechts")) {
     		    event.target.classList.remove("dragover");
+                savePorts(event);
+                saveLine(event);
     		    console.log("drop");
     		  }
     		});
     	}
     }
 
-    init();
+   // init();
+
+    function savePorts(event){
+        console.log('TargetClassnames ' + event.srcElement.className);
+        console.log('SourceClassnames ' + dragged.className);
+        console.log('TargetId ' + event.srcElement.id);
+        console.log('SourceId ' + dragged.id);
+    }
+
+    function saveLine(event){
+        var svgLinie = document.getElementById(dragged.id + 'Linie');
+        if(!svgLinie){
+            console.log("keine Linie");
+        }
+        else{
+            svgLinie.id  = svgLinie.id.slice(svgLinie.id.indexOf('p'),svgLinie.id.indexOf('Linie')) + '_' + event.srcElement.id + 'Linie';
+            console.log(svgLinie);
+        }
+    }
 
     function drawSVGLine(event){
-    	var svgLinie = document.getElementById(event.srcElement.attributes.id.value + 'Linie');
+    	var svgLinie = document.getElementById(event.srcElement.id + 'Linie');
     	var svgLinieName;
     	if(!svgLinie){
-    		svgLinieName = event.srcElement.attributes.id.value + 'Linie';
+    		svgLinieName = event.srcElement.id + 'Linie';
     		d3.select("#svgArtboard").append("line")
             .style("stroke", "black")
             .style("stroke-width", 3)
@@ -537,7 +557,7 @@ body{
     	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	//let neueLinie = document.querySelector('#newLine');
-    	var neueLinie = document.getElementById(event.srcElement.attributes.id.value + 'Linie');
+    	var neueLinie = document.getElementById(event.srcElement.id + 'Linie');
     	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
     	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
     	neueLinie.setAttribute("x2", Math.round(svgEndPoint.x));
