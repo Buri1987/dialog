@@ -27,7 +27,7 @@
         <div id="rechtesSystem" class="system sysNichtZugeordnet">
             <span></span><div>?</div></span>
         </div>
-        <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
+        <img id="trash" src="Images/Trash.png" class="unsichtbar">
         <button onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send to Widget</button>
         <div id="grid-fuer-canvas">
             <div id="div-fuer-canvas">
@@ -363,7 +363,7 @@ body{
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" class="port portRechts"></div>'+
+        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts" ></div>'+
                     '<div id="portBeschriftung2'+anzahlPortsRechts+'" class="portBeschriftung portBeschriftungRechts">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -523,22 +523,7 @@ body{
     		});
     	}
 
-        trash.addEventListener("dragover",function(ereignis){
-            ereignis.preventDefault();
-            ereignis.dataTransfer.dropEffect = "move";
-        });
-    
-        trash.addEventListener("drop",function(ereignis){
-            ereignis.preventDefault;
-            trash.classList.add("unsichtbar");
-            const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
-            const gezogenesElement = document.getElementById(ausgeleseneID);
-            gezogenesElement.remove();
-        });
-
-        trash.addEventListener("dragenter", function(ereignis){
-            trash.classList.add("trashtarget");
-        });
+        
 
     	var targets = document.body.getElementsByClassName("portRechts");
     	for(let i = 0; i < targets.length; i++){
@@ -550,8 +535,18 @@ body{
     		    event.preventDefault();
     		  },false);
 
+            target.addEventListener("dragstart", (event) => {
+                trash.classList.remove("unsichtbar");
+                event.dataTransfer.setData("text/plain", event.target.id);
+    		    // store a ref. on the dragged elem
+    		    dragged = event.target;
+    		    // make it half transparent
+    		    event.target.classList.add("dragging");
+    		    console.log("added dragging");
+    		});
+
     		target.addEventListener("dragenter", (event) => {
-    			console.log("dragenter vor if");
+                console.log("dragenter vor if");
     		  // highlight potential drop target when the draggable element enters it
     		  console.log(event.target);
     		  if (event.target.classList.contains("portRechts")) {
@@ -579,6 +574,23 @@ body{
     		    console.log("drop");
     		  }
     		});
+
+            trash.addEventListener("dragover",function(ereignis){
+                ereignis.preventDefault();
+                ereignis.dataTransfer.dropEffect = "move";
+            });
+          
+            trash.addEventListener("drop",function(ereignis){
+                ereignis.preventDefault;
+                trash.classList.add("unsichtbar");
+                const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
+                const gezogenesElement = document.getElementById(ausgeleseneID);
+                gezogenesElement.remove();
+            });
+          
+            trash.addEventListener("dragenter", function(ereignis){
+                trash.classList.add("trashtarget");
+            });
     	}
     }
 
