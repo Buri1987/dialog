@@ -341,6 +341,8 @@ body{
                     '       <option>Elektrisch</option>'+
                     '       <option>Mechanisch</option>'+
                     '       <option>Dampf</option>'+
+                    '       <option>Elektronenwolken</option>'+
+                    '       <option>Siemens-Lufthaken</option>'+
                     '    </select>'+
                     '</div>';
         html = $.parseHTML(htmlCode);
@@ -358,7 +360,8 @@ body{
             } 
         }
         anzahlPortsLinks++;
-        init();
+        svgLineDraw();
+        updateSVGLine();
     }
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
@@ -371,6 +374,8 @@ body{
                     '       <option>Elektrisch</option>'+
                     '       <option>Mechanisch</option>'+
                     '       <option>Dampf</option>'+
+                    '       <option>Elektronenwolken</option>'+
+                    '       <option>Siemens-Lufthaken</option>'+
                     '    </select>'+
                     '</div>';
         html = $.parseHTML(htmlCode);
@@ -388,7 +393,8 @@ body{
             } 
         }
         anzahlPortsRechts++;
-        init();
+        svgLineDraw();
+        updateSVGLine();
     }
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
@@ -493,15 +499,16 @@ body{
     var source;
     var target;
 
-    function init(){
+    function svgLineDraw(){
     	var sources = document.body.getElementsByClassName("portLinks");
         var trash = document.getElementById("trash");
     	for(let i = 0; i < sources.length; i++){
     		// events fired on the draggable target
     		source = sources[i];
     		source.addEventListener("drag", (event) => {
+    			event.preventDefault();
     			console.log(event);
-    			drawSVGLine(event);
+    			drawDraggableSVGLine(event);
     		  console.log("dragging");
     		});
 
@@ -572,26 +579,35 @@ body{
     		  }
     		});
 
-            trash.addEventListener("dragover",function(ereignis){
-                ereignis.preventDefault();
-                ereignis.dataTransfer.dropEffect = "move";
-            });
-          
-            trash.addEventListener("drop",function(ereignis){
-                ereignis.preventDefault;
-                trash.classList.add("unsichtbar");
-                const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
-                const gezogenesElement = document.getElementById(ausgeleseneID);
-                gezogenesElement.remove();
-            });
-          
-            trash.addEventListener("dragenter", function(ereignis){
-                trash.classList.add("trashtarget");
-            });
+            
     	}
+    	trash.addEventListener("dragover",function(ereignis){
+            ereignis.preventDefault();
+            ereignis.dataTransfer.dropEffect = "move";
+        });
+        
+         trash.addEventListener("drop",function(ereignis){
+             ereignis.preventDefault;
+             trash.classList.add("unsichtbar");
+             const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
+             const gezogenesElement = document.getElementById(ausgeleseneID);
+             var svgLines = document.getElementsByClassName("svgConnectors");
+             if(svgLines){
+              for(let i = 0; i < svgLines.length; i++){
+              	if(document.getElementById(svgLines[i].id).id.split("port").length == 2){
+              		svgLines[i].remove();
+              	}
+              }
+             }
+             gezogenesElement.remove();
+             
+         });
+       
+         trash.addEventListener("dragenter", function(ereignis){
+             trash.classList.add("trashtarget");
+         });
     }
 
-   // init();
 
     function savePorts(event){
         console.log('TargetClassnames ' + event.srcElement.className);
@@ -611,7 +627,7 @@ body{
         }
     }
 
-    function drawSVGLine(event){
+    function drawDraggableSVGLine(event){
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
     	if(!svgLinie){
@@ -619,6 +635,7 @@ body{
     		d3.select("#svgArtboard").append("line")
             .style("stroke", "black")
             .style("stroke-width", 3)
+            .attr("class", "svgConnectors")
             .attr("id", svgLinieName)
             .attr("x1", 0)
             .attr("y1", 0)
@@ -645,6 +662,53 @@ body{
     	console.log(svgEndPoint);
     	console.log(xCoord, yCoord);
     	console.log(event.screenX,event.screenY);
+    }
+    
+    function updateSVGLine(){
+    	var svgLines = document.getElementsByClassName("svgConnectors");
+    	var svgLinieName;
+    	if(!svgLines){
+    		
+    	}
+    	else{
+    		for(let i = 0; i < svgLines.length; i++){
+    			var sourcePortName = svgLines[i].id.slice(svgLines[i].id.indexOf('port'),svgLines[i].id.indexOf('_'));
+    			var targetPortName = svgLines[i].id.slice(svgLines[i].id.indexOf('_')+1,svgLines[i].id.indexOf('Linie'));
+    			var sourcePort = document.getElementById(sourcePortName);
+    			var targetPort = document.getElementById(targetPortName);
+    			if(!sourcePort || !targetPort){
+    				svgLines[i].remove();
+    			}
+    			else{
+        			var sourcePortRect = sourcePort.getBoundingClientRect();
+        			var sourceLeft = sourcePortRect.left + window.scrollX;
+        			var sourceTop =  sourcePortRect.top + window.scrollY;
+        			var sourceRight = sourcePortRect.right + window.scrollX;
+        			var sourceBottom =  sourcePortRect.bottom + window.scrollY;
+        			var sourceXYCoord = svgArtboard.createSVGPoint();
+        			sourceXYCoord.x = Math.round(((sourceRight - sourceLeft) / 2 ) + sourceLeft);
+        			sourceXYCoord.y = Math.round(((sourceBottom - sourceTop) / 2 ) + sourceTop);
+	    	
+        	    	let svgSourceCoord = sourceXYCoord.matrixTransform(svgArtboard.getScreenCTM().inverse());
+
+        			var targetPortRect = targetPort.getBoundingClientRect();
+        			var targetLeft = targetPortRect.left + window.scrollX;
+        			var targetTop =  targetPortRect.top + window.scrollY;
+        			var targetRight = targetPortRect.right + window.scrollX;
+        			var targetBottom =  targetPortRect.bottom + window.scrollY;
+        			var targetXYCoord = svgArtboard.createSVGPoint();
+        			targetXYCoord.x = Math.round(((targetRight - targetLeft) / 2 ) + targetLeft);
+        			targetXYCoord.y = Math.round(((targetBottom - targetTop) / 2 ) + targetTop);
+	    	
+        	    	let svgTargetCoord = targetXYCoord.matrixTransform(svgArtboard.getScreenCTM().inverse());
+   			
+        			svgLines[i].setAttribute("x1", Math.round(svgSourceCoord.x));
+        	    	svgLines[i].setAttribute("y1", Math.round(svgSourceCoord.y));
+        	    	svgLines[i].setAttribute("x2", Math.round(svgTargetCoord.x));
+        	    	svgLines[i].setAttribute("y2", Math.round(svgTargetCoord.y));
+    			}
+    		}
+    	}
     }
 
     let dragged;
