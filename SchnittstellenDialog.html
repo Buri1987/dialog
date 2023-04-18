@@ -19,14 +19,15 @@
                 2472<br>Propellermotoren für Hauptantrieb
             </div>
             <div id="portContainerLinks" class="portContainer">
-                <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
+                
             </div>
-            <img src="plus.png" onclick="portHinzufuegenLinks()">
+            <img src="Images/plus.png" onclick="portHinzufuegenLinks()">
             
         </div>
         <div id="rechtesSystem" class="system sysNichtZugeordnet">
             <span></span><div>?</div></span>
         </div>
+        <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
         <button onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send to Widget</button>
         <div id="grid-fuer-canvas">
             <div id="div-fuer-canvas">
@@ -289,6 +290,23 @@ body{
     transform: translate(-50%,0);
 }
 
+#trash{
+    height: 70px;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+.unsichtbar{
+    visibility: hidden;
+}
+
+.trashtarget{
+    background-color: red;
+}
+
+
+
 </style>
 <script>
     //Onlinetest
@@ -381,7 +399,7 @@ body{
                         '</div>'+
                         '<div id="portContainerRechts" class="portContainer">'+
                         '</div>'+
-                        '<img src="plus.png" onclick="portHinzufuegenRechts()">';
+                        '<img src="Images/plus.png" onclick="portHinzufuegenRechts()">';
         document.getElementById('rechtesSystem').innerHTML = htmlCode;                
     }
 
@@ -477,6 +495,7 @@ body{
 
     function init(){
     	var sources = document.body.getElementsByClassName("portLinks");
+        var trash = document.getElementById("trash");
     	for(let i = 0; i < sources.length; i++){
     		// events fired on the draggable target
     		source = sources[i];
@@ -503,7 +522,6 @@ body{
     		});
     	}
 
-        var trash = document.getElementById("trash");
         trash.addEventListener("dragover",function(ereignis){
             ereignis.preventDefault();
             ereignis.dataTransfer.dropEffect = "move";
@@ -515,6 +533,10 @@ body{
             const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
             const gezogenesElement = document.getElementById(ausgeleseneID);
             gezogenesElement.remove();
+        });
+
+        trash.addEventListener("dragenter", function(ereignis){
+            trash.classList.add("trashtarget");
         });
 
     	var targets = document.body.getElementsByClassName("portRechts");
