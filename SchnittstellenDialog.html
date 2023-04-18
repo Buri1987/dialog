@@ -358,7 +358,7 @@ body{
             } 
         }
         anzahlPortsLinks++;
-        init();
+        svgLineDraw();
     }
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
@@ -371,6 +371,7 @@ body{
                     '       <option>Elektrisch</option>'+
                     '       <option>Mechanisch</option>'+
                     '       <option>Dampf</option>'+
+                    '       <option>Elektronenwolken</option>'+
                     '    </select>'+
                     '</div>';
         html = $.parseHTML(htmlCode);
@@ -388,7 +389,7 @@ body{
             } 
         }
         anzahlPortsRechts++;
-        init();
+        svgLineDraw();
     }
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
@@ -493,7 +494,7 @@ body{
     var source;
     var target;
 
-    function init(){
+    function svgLineDraw(){
     	var sources = document.body.getElementsByClassName("portLinks");
         var trash = document.getElementById("trash");
     	for(let i = 0; i < sources.length; i++){
@@ -581,7 +582,6 @@ body{
     	}
     }
 
-   // init();
 
     function savePorts(event){
         console.log('TargetClassnames ' + event.srcElement.className);
