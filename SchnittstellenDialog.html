@@ -501,8 +501,9 @@ body{
     		// events fired on the draggable target
     		source = sources[i];
     		source.addEventListener("drag", (event) => {
+    			event.preventDefault();
     			console.log(event);
-    			drawSVGLine(event);
+    			drawDraggableSVGLine(event);
     		  console.log("dragging");
     		});
 
@@ -613,7 +614,7 @@ body{
         }
     }
 
-    function drawSVGLine(event){
+    function drawDraggableSVGLine(event){
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
     	if(!svgLinie){
@@ -621,11 +622,67 @@ body{
     		d3.select("#svgArtboard").append("line")
             .style("stroke", "black")
             .style("stroke-width", 3)
+            .attr("class", "svgConnectors")
             .attr("id", svgLinieName)
             .attr("x1", 0)
             .attr("y1", 0)
             .attr("x2", 0)
             .attr("y2", 0); ;
+    	}
+    	
+    	var rect = event.srcElement.getBoundingClientRect();
+    	let xCoord = Math.round(((rect.right - rect.left) / 2 ) + rect.left);
+    	let yCoord = Math.round(((rect.bottom - rect.top) / 2 ) + rect.top);
+    	startPoint.x = xCoord;
+    	startPoint.y = yCoord;
+    	endPoint.x = event.clientX;
+    	endPoint.y = event.clientY;
+    	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
+    	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
+    	//let neueLinie = document.querySelector('#newLine');
+    	var neueLinie = document.getElementById(event.srcElement.id + '_Linie');
+    	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
+    	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
+    	neueLinie.setAttribute("x2", Math.round(svgEndPoint.x));
+    	neueLinie.setAttribute("y2", Math.round(svgEndPoint.y));
+    	console.log(svgStartPoint);
+    	console.log(svgEndPoint);
+    	console.log(xCoord, yCoord);
+    	console.log(event.screenX,event.screenY);
+    }
+    
+    function updateSVGLine(){
+    	var svgLines = document.getElementsByClassName("svgConnectors");
+    	var svgLinieName;
+    	if(!svgLines){
+    		
+    	}
+    	else{
+    		for(let i = 0; i < svgLines.length; i++){
+    			var sourcePortName = svgLines[0].id.slice(svgLines[0].id.indexOf('port'),svgLines[0].id.indexOf('_'));
+    			var targetPortName = svgLines[0].id.slice(svgLines[0].id.indexOf('_')+1,svgLines[0].id.indexOf('Linie'));
+    			var sourcePort = document.getElementById(sourcePortName);
+    			var targetPort = document.getElementById(targetPortName);
+    			
+    			var sourcePortRect = sourcePort.getBoundingClientRect();
+    			var sourceLeft = sourcePortRect.left + window.scrollX;
+    			var sourceTop =  sourcePortRect.top + window.scrollY;
+    			var sourceRight = sourcePortRect.right + window.scrollX;
+    			var sourceBottom =  sourcePortRect.bottom + window.scrollY;
+    			var sourceXCoord = Math.round(((sourceRight - sourceLeft) / 2 ) + sourceLeft);
+    	    	var sourceYCoord = Math.round(((sourceBottom - sourceTop) / 2 ) + sourceTop);
+    	    	svgLines[i].setAttribute("x1", Math.round(sourceXCoord));
+    	    	svgLines[i].setAttribute("y1", Math.round(sourceYCoord));
+    			
+    			
+    			var targetPortRect = targetPort.getBoundingClientRect();
+    			var targetLeft = targetPortRect.left + window.scrollX;
+    			var targetTop =  targetPortRect.top + window.scrollY;
+    			
+    			
+    			
+    		}
+    		
     	}
     	
     	var rect = event.srcElement.getBoundingClientRect();
