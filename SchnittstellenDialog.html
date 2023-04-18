@@ -19,14 +19,15 @@
                 2472<br>Propellermotoren für Hauptantrieb
             </div>
             <div id="portContainerLinks" class="portContainer">
-                <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
+                
             </div>
-            <img src="plus.png" onclick="portHinzufuegenLinks()">
+            <img src="Images/plus.png" onclick="portHinzufuegenLinks()">
             
         </div>
         <div id="rechtesSystem" class="system sysNichtZugeordnet">
             <span></span><div>?</div></span>
         </div>
+        <img id="trash" src="Images/Trash.jpg" class="unsichtbar">
         <button onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send to Widget</button>
         <div id="grid-fuer-canvas">
             <div id="div-fuer-canvas">
@@ -289,6 +290,23 @@ body{
     transform: translate(-50%,0);
 }
 
+#trash{
+    height: 70px;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+.unsichtbar{
+    visibility: hidden;
+}
+
+.trashtarget{
+    background-color: red;
+}
+
+
+
 </style>
 <script>
     //Onlinetest
@@ -345,7 +363,7 @@ body{
     var anzahlPortsRechts = 0;
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts"></div>'+
+        let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" class="port portRechts"></div>'+
                     '<div id="portBeschriftung2'+anzahlPortsRechts+'" class="portBeschriftung portBeschriftungRechts">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
@@ -381,7 +399,7 @@ body{
                         '</div>'+
                         '<div id="portContainerRechts" class="portContainer">'+
                         '</div>'+
-                        '<img src="plus.png" onclick="portHinzufuegenRechts()">';
+                        '<img src="Images/plus.png" onclick="portHinzufuegenRechts()">';
         document.getElementById('rechtesSystem').innerHTML = htmlCode;                
     }
 
@@ -477,6 +495,7 @@ body{
 
     function init(){
     	var sources = document.body.getElementsByClassName("portLinks");
+        var trash = document.getElementById("trash");
     	for(let i = 0; i < sources.length; i++){
     		// events fired on the draggable target
     		source = sources[i];
@@ -503,7 +522,6 @@ body{
     		});
     	}
 
-        var trash = document.getElementById("trash");
         trash.addEventListener("dragover",function(ereignis){
             ereignis.preventDefault();
             ereignis.dataTransfer.dropEffect = "move";
@@ -515,6 +533,10 @@ body{
             const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
             const gezogenesElement = document.getElementById(ausgeleseneID);
             gezogenesElement.remove();
+        });
+
+        trash.addEventListener("dragenter", function(ereignis){
+            trash.classList.add("trashtarget");
         });
 
     	var targets = document.body.getElementsByClassName("portRechts");
@@ -569,21 +591,21 @@ body{
     }
 
     function saveLine(event){
-        var svgLinie = document.getElementById(dragged.id + 'Linie');
+        var svgLinie = document.getElementById(dragged.id + '_Linie');
         if(!svgLinie){
             console.log("keine Linie");
         }
         else{
-            svgLinie.id  = svgLinie.id.slice(svgLinie.id.indexOf('p'),svgLinie.id.indexOf('Linie')) + '_' + event.srcElement.id + 'Linie';
+            svgLinie.id  = svgLinie.id.slice(svgLinie.id.indexOf('p'),svgLinie.id.indexOf('_Linie')) + '_' + event.srcElement.id + 'Linie';
             console.log(svgLinie);
         }
     }
 
     function drawSVGLine(event){
-    	var svgLinie = document.getElementById(event.srcElement.id + 'Linie');
+    	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
     	if(!svgLinie){
-    		svgLinieName = event.srcElement.id + 'Linie';
+    		svgLinieName = event.srcElement.id + '_Linie';
     		d3.select("#svgArtboard").append("line")
             .style("stroke", "black")
             .style("stroke-width", 3)
@@ -604,7 +626,7 @@ body{
     	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	//let neueLinie = document.querySelector('#newLine');
-    	var neueLinie = document.getElementById(event.srcElement.id + 'Linie');
+    	var neueLinie = document.getElementById(event.srcElement.id + '_Linie');
     	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
     	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
     	neueLinie.setAttribute("x2", Math.round(svgEndPoint.x));
