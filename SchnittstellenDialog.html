@@ -323,10 +323,7 @@ body {
 }
 </style>
 <script type="text/javascript">
-    //Onlinetest
-    //CLient Kommentar 2
-    //Remote Branch Kommentar
-    //Client Branch Kommentar
+
     window.name = "Schnittstellendialog";
     window.addEventListener("message", async function(event) {
                             
@@ -381,6 +378,7 @@ body {
         setEventListeners(html);
         updateSVGLine();
     }
+    
     var anzahlPortsRechts = 0;
     var anzahlPortsRechtsFuerPositionNachLoeschen = 0;
     function portHinzufuegenRechts(){
@@ -419,6 +417,7 @@ body {
         setEventListeners(html);
         updateSVGLine();
     }
+    
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
         document.getElementById('rechtesSystem').classList.remove('sysNichtZugeordnet');
@@ -548,8 +547,7 @@ body {
     let svgArtboard = document.querySelector('#svgArtboard');
     let startPoint = svgArtboard.createSVGPoint();
     let endPoint = svgArtboard.createSVGPoint();
-    var source;
-    var target;
+    let dragged;
 
     function setEventListeners(html){
         var trash = document.getElementById("trash");
@@ -648,6 +646,7 @@ body {
         console.log('TargetId ' + event.srcElement.id);
         console.log('SourceId ' + dragged.id);
     }
+    
 
     function saveLine(event){
         var svgLinie = document.getElementById(dragged.id + '_Linie');
@@ -660,6 +659,7 @@ body {
         }
     }
 
+    
     function drawDraggableSVGLine(event){
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
@@ -696,6 +696,7 @@ body {
     	console.log(xCoord, yCoord);
     	console.log(event.screenX,event.screenY);
     }
+    
     
     function updateSVGLine(){
     	var svgLines = document.getElementsByClassName("svgConnectors");
@@ -744,7 +745,6 @@ body {
     	}
     }
 
-    let dragged;
 
 
    
