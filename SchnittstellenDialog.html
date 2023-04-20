@@ -360,7 +360,7 @@ body {
                     '       <option>Siemens-Lufthaken</option>'+
                     '    </select>'+
                     '</div>';
-        html = $.parseHTML(htmlCode);
+        let html = $.parseHTML(htmlCode);
         $("#portContainerLinks").append(html);
 
         //2. Ports gleichmaeßig verteilen:
@@ -378,7 +378,7 @@ body {
         }
         anzahlPortsLinks++;
         anzahlPortsLinksfuerPositionNachLoeschen++;
-        svgLineDraw();
+        setEventListeners(html);
         updateSVGLine();
     }
     var anzahlPortsRechts = 0;
@@ -397,7 +397,7 @@ body {
                     '       <option>Siemens-Lufthaken</option>'+
                     '    </select>'+
                     '</div>';
-        html = $.parseHTML(htmlCode);
+        let html = $.parseHTML(htmlCode);
         $("#portContainerRechts").append(html);
 
         //2. Ports gleichmaeßig verteilen:
@@ -416,7 +416,7 @@ body {
         }
         anzahlPortsRechts++;
         anzahlPortsRechtsFuerPositionNachLoeschen++;
-        svgLineDraw();
+        setEventListeners(html);
         updateSVGLine();
     }
     function setSys2(sysName){
@@ -490,28 +490,57 @@ body {
     /*                  PortsToTrash                    */
     /*                                                  */
     /****************************************************/
-
-    //const port = getElementByID("port11");
-  //const trash = document.getElementById("trash");
-    
-
-    /*port.addEventListener("dragstart",function(ereignis){
-        trash.classList.remove("unsichtbar");
-        ereignis.dataTransfer.setData("text/plain", ereignis.target.id);
-    });*/
-/*
     trash.addEventListener("dragover",function(ereignis){
         ereignis.preventDefault();
         ereignis.dataTransfer.dropEffect = "move";
     });
-
+    
     trash.addEventListener("drop",function(ereignis){
-        ereignis.preventDefault;
-        trash.classList.add("unsichtbar");
-        const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
-        const gezogenesElement = document.getElementById(ausgeleseneID);
-        gezogenesElement.remove;
-    });*/
+         ereignis.preventDefault;
+         trash.classList.add("unsichtbar");
+         ereignis.target.classList.remove("trashtarget");
+         const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
+         const gezogenesElement = document.getElementById(ausgeleseneID);
+         const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
+         const gezogeneKinder = document.getElementById(ausgeleseneKinder);
+         var svgLines = document.getElementsByClassName("svgConnectors");
+         var gezogenesElementID;
+         if(gezogenesElement){
+         	gezogenesElementID = gezogenesElement.id;
+         }
+         if(svgLines){
+        	 var svgLength = svgLines.length;
+          for(let i = 0; i < svgLength; i++){
+          	if(document.getElementById(svgLines[0].id).id.split("port").length == 2){
+          		svgLines[0].remove();
+          	}
+          	else if(document.getElementById(svgLines[0].id).id.split("_").find(element => element == gezogenesElementID)){
+          		svgLines[0].remove();
+          	}
+          }
+         }
+         if(gezogenesElement){
+            if(ausgeleseneID[4]==1){
+               anzahlPortsLinksfuerPositionNachLoeschen--;
+            }
+            if(ausgeleseneID[4]==2){
+               anzahlPortsRechtsFuerPositionNachLoeschen--;
+            }
+            gezogenesElement.remove();
+            gezogeneKinder.remove();
+        }
+         
+     });
+   
+    trash.addEventListener("dragenter", function(ereignis){
+    	trash.classList.add("trashtarget");
+    });
+     
+     trash.addEventListener("dragleave", (event) => {
+		// reset background of potential drop target when the draggable element leaves it
+		event.target.classList.remove("trashtarget");
+		console.log("dragleave");
+	});
 
     
     //Anteil Lennard SVG Linie zeichnen
@@ -522,12 +551,12 @@ body {
     var source;
     var target;
 
-    function svgLineDraw(){
-    	var sources = document.body.getElementsByClassName("portLinks");
+    function setEventListeners(html){
         var trash = document.getElementById("trash");
-    	for(let i = 0; i < sources.length; i++){
+        if(html[0].classList == "port portLinks"){
     		// events fired on the draggable target
-    		source = sources[i];
+    		//source = sources[i];
+    		var source = html[0];
     		source.addEventListener("drag", (event) => {
     			event.preventDefault();
     			console.log(event);
@@ -553,10 +582,9 @@ body {
     		});
     	}
 
-        var targets = document.body.getElementsByClassName("portRechts");
-    	for(let i = 0; i < targets.length; i++){
+        if(html[0].classList == "port portRechts"){
     		// events fired on the drop targets
-    		target = targets[i];
+    		var target = html[0];
     		console.log("add droptarget");
     		target.addEventListener("dragover",  (event) => {
     		    // prevent default to allow drop
@@ -609,52 +637,7 @@ body {
     		    console.log("drop");
     		  }
     		});
-
-            
     	}
-    	
-    	trash.addEventListener("dragover",function(ereignis){
-            ereignis.preventDefault();
-            ereignis.dataTransfer.dropEffect = "move";
-        });
-        
-        trash.addEventListener("drop",function(ereignis){
-             ereignis.preventDefault;
-             trash.classList.add("unsichtbar");
-             const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
-             const gezogenesElement = document.getElementById(ausgeleseneID);
-             const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
-             const gezogeneKinder = document.getElementById(ausgeleseneKinder);
-             var svgLines = document.getElementsByClassName("svgConnectors");
-             if(svgLines){
-              for(let i = 0; i < svgLines.length; i++){
-              	if(document.getElementById(svgLines[i].id).id.split("port").length == 2){
-              		svgLines[i].remove();
-              	}
-              }
-             }
-             if(gezogenesElement){
-                if(ausgeleseneID[4]==1){
-                   anzahlPortsLinksfuerPositionNachLoeschen--;
-                }
-                if(ausgeleseneID[4]==2){
-                   anzahlPortsRechtsFuerPositionNachLoeschen--;
-                }
-                gezogenesElement.remove();
-                gezogeneKinder.remove();
-            }
-             
-         });
-       
-        trash.addEventListener("dragenter", function(ereignis){
-        	trash.classList.add("trashtarget");
-        });
-         
-         trash.addEventListener("dragleave", (event) => {
-   		  // reset background of potential drop target when the draggable element leaves it
-   		   event.target.classList.remove("trashtarget");
-   		   console.log("dragleave");
-   		});
     }
 
 
@@ -672,7 +655,7 @@ body {
             console.log("keine Linie");
         }
         else{
-            svgLinie.id  = svgLinie.id.slice(svgLinie.id.indexOf('p'),svgLinie.id.indexOf('_Linie')) + '_' + event.srcElement.id + 'Linie';
+            svgLinie.id  = svgLinie.id.slice(svgLinie.id.indexOf('p'),svgLinie.id.indexOf('_Linie')) + '_' + event.srcElement.id + '_Linie';
             console.log(svgLinie);
         }
     }
@@ -723,7 +706,7 @@ body {
     	else{
     		for(let i = 0; i < svgLines.length; i++){
     			var sourcePortName = svgLines[i].id.slice(svgLines[i].id.indexOf('port'),svgLines[i].id.indexOf('_'));
-    			var targetPortName = svgLines[i].id.slice(svgLines[i].id.indexOf('_')+1,svgLines[i].id.indexOf('Linie'));
+    			var targetPortName = svgLines[i].id.slice(svgLines[i].id.indexOf('_')+1,svgLines[i].id.indexOf('_Linie'));
     			var sourcePort = document.getElementById(sourcePortName);
     			var targetPort = document.getElementById(targetPortName);
     			if(!sourcePort || !targetPort){
