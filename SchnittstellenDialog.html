@@ -345,6 +345,7 @@ body {
     }
 
     var anzahlPortsLinks = 0;
+    var anzahlPortsLinksfuerPositionNachLoeschen = 0;
     function portHinzufuegenLinks(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" class="port portLinks"></div>'+
@@ -363,21 +364,25 @@ body {
         $("#portContainerLinks").append(html);
 
         //2. Ports gleichmaeßig verteilen:
-        if (anzahlPortsLinks == 0) {
+        if (anzahlPortsLinksfuerPositionNachLoeschen == 0) {
             document.getElementById('port10').style.top = "50%";
             document.getElementById('portBeschriftung10').style.top = "50%";
         } else {
-            for (let index = 0; index <= anzahlPortsLinks; index++) {
+            for (let index = 0; index <= anzahlPortsLinksfuerPositionNachLoeschen; index++) {
                 let id = index;
-                document.getElementById('port1'+id).style.top = index/anzahlPortsLinks*100+'%';
-                document.getElementById('portBeschriftung1'+id).style.top = index/anzahlPortsLinks*100+'%';
+                if(document.getElementById('port1'+id)){
+                    document.getElementById('port1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
+                    document.getElementById('portBeschriftung1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
+                }
             } 
         }
         anzahlPortsLinks++;
+        anzahlPortsLinksfuerPositionNachLoeschen++;
         svgLineDraw();
         updateSVGLine();
     }
     var anzahlPortsRechts = 0;
+    var anzahlPortsRechtsFuerPositionNachLoeschen = 0;
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts" ></div>'+
@@ -396,17 +401,21 @@ body {
         $("#portContainerRechts").append(html);
 
         //2. Ports gleichmaeßig verteilen:
-        if (anzahlPortsRechts == 0) {
+        if (anzahlPortsRechtsFuerPositionNachLoeschen == 0) {
             document.getElementById('port20').style.top = "50%";
             document.getElementById('portBeschriftung20').style.top = "50%";
         } else {
-            for (let index = 0; index <= anzahlPortsRechts; index++) {
+            for (let index = 0; index <= anzahlPortsRechtsFuerPositionNachLoeschen; index++) {
                 let id = index;
-                document.getElementById('port2'+id).style.top = index/anzahlPortsRechts*100+'%';
-                document.getElementById('portBeschriftung2'+id).style.top = index/ anzahlPortsRechts*100+'%';
+                if(document.getElementById('port2'+id)){
+                    document.getElementById('port2'+id).style.top = index/anzahlPortsRechtsFuerPositionNachLoeschen*100+'%';
+                    document.getElementById('portBeschriftung2'+id).style.top = index/ anzahlPortsRechtsFuerPositionNachLoeschen*100+'%';
+                }
+                
             } 
         }
         anzahlPortsRechts++;
+        anzahlPortsRechtsFuerPositionNachLoeschen++;
         svgLineDraw();
         updateSVGLine();
     }
@@ -614,6 +623,8 @@ body {
              trash.classList.add("unsichtbar");
              const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
              const gezogenesElement = document.getElementById(ausgeleseneID);
+             const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
+             const gezogeneKinder = document.getElementById(ausgeleseneKinder);
              var svgLines = document.getElementsByClassName("svgConnectors");
              if(svgLines){
               for(let i = 0; i < svgLines.length; i++){
@@ -622,7 +633,16 @@ body {
               	}
               }
              }
-             gezogenesElement.remove();
+             if(gezogenesElement){
+                if(ausgeleseneID[4]==1){
+                   anzahlPortsLinksfuerPositionNachLoeschen--;
+                }
+                if(ausgeleseneID[4]==2){
+                   anzahlPortsRechtsFuerPositionNachLoeschen--;
+                }
+                gezogenesElement.remove();
+                gezogeneKinder.remove();
+            }
              
          });
        
