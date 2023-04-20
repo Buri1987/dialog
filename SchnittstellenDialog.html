@@ -1,314 +1,326 @@
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 <body>
-<div class="grid-container2">
-    <div class="header">
-    Schnittstellen definieren
-    </div>
-    <div id="bgButtonLine">
-        <button id="bgButton1">Bg ändern</button>
-        <button id="bgButton2" onclick="setSys2('2500<br>Leistungs-Leistungs-übertragungsanalgen')">Bg ändern</button>
-    </div>
-    <div class="rand">
-    <svg id="svgArtboard" width=100% height=100%>
+	<div class="grid-container2">
+		<div class="header">Schnittstellen definieren</div>
+		<div id="bgButtonLine">
+			<button id="bgButton1">Bg ändern</button>
+			<button id="bgButton2"
+				onclick="setSys2('2500<br>Leistungs-Leistungs-übertragungsanalgen')">Bg
+				ändern</button>
+		</div>
+		<div class="rand">
+			<svg id="svgArtboard" width=100% height=100%>
         </svg>
-        <div id="linkesSystem" class="system sysZugeordnet">
-            <div id="sys1Beschreibung" class="sysBeschreibung">
-                2472<br>Propellermotoren für Hauptantrieb
-            </div>
-            <div id="portContainerLinks" class="portContainer">
-                
-            </div>
-            <img src="Images/plus.png" onclick="portHinzufuegenLinks()">
-            
-        </div>
-        <div id="rechtesSystem" class="system sysNichtZugeordnet">
-            <span></span><div>?</div></span>
-        </div>
-        <img id="trash" src="Images/Trash.png" class="unsichtbar">
-        <button onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send to Widget</button>
-        <div id="grid-fuer-canvas">
-            <div id="div-fuer-canvas">
-                <canvas id="canvasConnectoren"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+			<div id="linkesSystem" class="system sysZugeordnet">
+				<div id="sys1Beschreibung" class="sysBeschreibung">
+					2472<br>Propellermotoren für Hauptantrieb
+				</div>
+				<div id="portContainerLinks" class="portContainer"></div>
+				<img src="Images/plus.png" onclick="portHinzufuegenLinks()">
+
+			</div>
+			<div id="rechtesSystem" class="system sysNichtZugeordnet">
+				<span></span>
+				<div>?</div>
+			</div>
+			<img id="trash" src="Images/Trash.png" class="unsichtbar">
+			<button
+				onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send
+				to Widget</button>
+			<div id="grid-fuer-canvas">
+				<div id="div-fuer-canvas">
+					<canvas id="canvasConnectoren"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 //test
 <style>
 html, body {
- margin: 0 
+	margin: 0
 }
 
 .dragging {
-  opacity: 0.5;
-  background-color: blue;
+	opacity: 0.5;
+	background-color: blue;
 }
 
 .dropzone {
-  width: 200px;
-  height: 20px;
-  background: blueviolet;
-  margin: 10px;
-  padding: 10px;
+	width: 200px;
+	height: 20px;
+	background: blueviolet;
+	margin: 10px;
+	padding: 10px;
 }
 
 .dragover {
-  background-color: puple;
+	background-color: puple;
 }
 
-body{
-    background: white;
+body {
+	background: white;
 }
 
-#grid-fuer-canvas{
-    position: absolute;
-    display: inline-grid;
-    grid-template-columns: 106px auto 106px ;
-    height: 100%;
-    width: 100%;
-    z-index: 0;
+#grid-fuer-canvas {
+	position: absolute;
+	display: inline-grid;
+	grid-template-columns: 106px auto 106px;
+	height: 100%;
+	width: 100%;
+	z-index: 0;
 }
 
-#div-fuer-canvas{
-    grid-column: 2;
-    position: relative;
-    height: 68%;
-    top: 50%;
-    transform: translate(0,-50%);
+#div-fuer-canvas {
+	grid-column: 2;
+	position: relative;
+	height: 68%;
+	top: 50%;
+	transform: translate(0, -50%);
 }
 
-#canvasConnectoren{
-    position: absolute;
-    width: 100%;
-    height: 100%;
+#canvasConnectoren {
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }
 
-.grid-container{
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    box-shadow: 4px 4px 4px -1px rgba(0,0,0,0.52);
-    display: inline-grid;
-    width: 560px;
-    height: 400px;
-    overflow: hidden;
-    border: 1px solid black;
-    border-radius: 18px;
-    grid-template-rows: 28px 24px auto;
+.grid-container {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+	box-shadow: 4px 4px 4px -1px rgba(0, 0, 0, 0.52);
+	display: inline-grid;
+	width: 560px;
+	height: 400px;
+	overflow: hidden;
+	border: 1px solid black;
+	border-radius: 18px;
+	grid-template-rows: 28px 24px auto;
 }
 
-.grid-container2{
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    overflow: hidden;
-    display: inline-grid;
-    width: 100%;
-    height: 100%;
-    grid-template-rows: 28px 24px auto;
+.grid-container2 {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+	overflow: hidden;
+	display: inline-grid;
+	width: 100%;
+	height: 100%;
+	grid-template-rows: 28px 24px auto;
 }
 
-.header{
-    background: #595959;
-    text-align: center;
-    font-size: 20px;
-    line-height: 28px;
-    vertical-align: middle;
-    font-weight: 600;
-    color: white;
+.header {
+	background: #595959;
+	text-align: center;
+	font-size: 20px;
+	line-height: 28px;
+	vertical-align: middle;
+	font-weight: 600;
+	color: white;
 }
 
-#bgButtonLine{
-    position: relative;
-}
-#bgButtonLine button{
-    position: absolute;
-    height: 80%;
-    width: 120px;
-    top: 50%;
-    transform: translate(0, -50%);
-}
-#bgButton1{
-    left: 4px;
-}
-#bgButton2{
-    right: 4px;    
-}
-.rand{
-    border-width: 3px;
-    border-color: white;
-    background: white;
-    position: relative;
-}
-.system{
-    width: 100px;
-    height: 85%;
-    position: absolute;
-    background-color: lightgrey;
-    top: 50%;
-    transform: translate(0%, -50%);
-    z-index: 10;
-}
-.sysNichtZugeordnet{
-    border: 2px dashed darkgrey;
-    }
-.sysNichtZugeordnet div{
-    color: black;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-    font-weight: 600;
-    font-size: 100px;
-    font-family: Arial, Helvetica, sans-serif;
+#bgButtonLine {
+	position: relative;
 }
 
-.sysZugeordnet{
-    border: 2px solid black;
-}
-.system .sysBeschreibung{
-    color: black;
-    position: absolute;
-    text-align: center;
-    transform: translate(-75%, -50%) rotate(180deg);
-    writing-mode: vertical-rl;
-    font-size: 14px;
-    font-weight: 700;
-    top: 50%;
-    left: 50%;
-    z-index: 10;
-    
-}
-#linkesSystem{
-    margin-left: -3px;
-    left: 0;
-
-}
-#rechtesSystem{
-    margin-right: -3px;
-    right: 0;
-}
-.system img{
-    height: 20px;
-    position: absolute;
-    z-index: 10;
-    cursor: pointer;
-}
-#linkesSystem img{
-    right: -20px;
-    bottom: -7px;
-}
-#rechtesSystem img{
-    left: -20px;
-    bottom: -7px;
-}
-.portContainer{
-    width: 16px;
-    height: 80%;
-    position: absolute;
-    top:50%;
-    z-index: 10;
-
-}
-#portContainerLinks{
-    right: 0;
-    transform: translate(50%, -50%);
-
-}
-#portContainerRechts{
-    left: 0;
-    transform: translate(-50%, -50%);
-}
-.port{
-    position: absolute;
-    height: 12px;
-    background:white;
-    width: 12px;
-    border: 2px solid black;
-    cursor: pointer;
-    transform: translate(0, -50%);
+#bgButtonLine button {
+	position: absolute;
+	height: 80%;
+	width: 120px;
+	top: 50%;
+	transform: translate(0, -50%);
 }
 
-.portBeschriftung{
-    position: absolute;
-    width: 100px;
-    height: 35px;
-    
-}
-.portBeschriftungLinks{
-    transform: translate(100%, -50%);
-    right: -4px;
-}
-.portBeschriftungRechts{
-    transform: translate(-100%, -50%);
-    left: -4px;
+#bgButton1 {
+	left: 4px;
 }
 
-.portBeschriftung input{
-    height: 12px;
-    font-size: 11px;
-    width: 120px;
-
-}
-.portBeschriftungRechts input{
-    float: right;   
-
+#bgButton2 {
+	right: 4px;
 }
 
-.portBeschriftung select{
-
-    background-color: #3498DB;
-    color: white;
-    border: none;
-    hyphens: auto;
-    cursor: pointer;
-    width: 90px;
-    height: 12px;
-    font-size: 10px;
-}
-.portBeschriftungRechts select{
-    float: right;
-
-}
-.rand>button{
-    background-color: #3498DB;
-    color: white;
-    border: none;
-    hyphens: auto;
-    cursor: pointer;
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    width: 100px;
-    font-size: 12px;
-    transform: translate(-50%,0);
+.rand {
+	border-width: 3px;
+	border-color: white;
+	background: white;
+	position: relative;
 }
 
-#trash{
-    height: 70px;
-    right: 110;
-    bottom: 0;
-    position: absolute;
+.system {
+	width: 100px;
+	height: 85%;
+	position: absolute;
+	background-color: lightgrey;
+	top: 50%;
+	transform: translate(0%, -50%);
+	z-index: 10;
 }
 
-.unsichtbar{
-    visibility: hidden;
+.sysNichtZugeordnet {
+	border: 2px dashed darkgrey;
 }
 
-.trashtarget{
-    background-color: red;
+.sysNichtZugeordnet div {
+	color: black;
+	position: absolute;
+	transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+	font-weight: 600;
+	font-size: 100px;
+	font-family: Arial, Helvetica, sans-serif;
 }
 
+.sysZugeordnet {
+	border: 2px solid black;
+}
 
+.system .sysBeschreibung {
+	color: black;
+	position: absolute;
+	text-align: center;
+	transform: translate(-75%, -50%) rotate(180deg);
+	writing-mode: vertical-rl;
+	font-size: 14px;
+	font-weight: 700;
+	top: 50%;
+	left: 50%;
+	z-index: 10;
+}
 
+#linkesSystem {
+	margin-left: -3px;
+	left: 0;
+}
+
+#rechtesSystem {
+	margin-right: -3px;
+	right: 0;
+}
+
+.system img {
+	height: 20px;
+	position: absolute;
+	z-index: 10;
+	cursor: pointer;
+}
+
+#linkesSystem img {
+	right: -20px;
+	bottom: -7px;
+}
+
+#rechtesSystem img {
+	left: -20px;
+	bottom: -7px;
+}
+
+.portContainer {
+	width: 16px;
+	height: 80%;
+	position: absolute;
+	top: 50%;
+	z-index: 10;
+}
+
+#portContainerLinks {
+	right: 0;
+	transform: translate(50%, -50%);
+}
+
+#portContainerRechts {
+	left: 0;
+	transform: translate(-50%, -50%);
+}
+
+.port {
+	position: absolute;
+	height: 12px;
+	background: white;
+	width: 12px;
+	border: 2px solid black;
+	cursor: pointer;
+	transform: translate(0, -50%);
+}
+
+.portBeschriftung {
+	position: absolute;
+	width: 100px;
+	height: 35px;
+}
+
+.portBeschriftungLinks {
+	transform: translate(100%, -50%);
+	right: -4px;
+}
+
+.portBeschriftungRechts {
+	transform: translate(-100%, -50%);
+	left: -4px;
+}
+
+.portBeschriftung input {
+	height: 12px;
+	font-size: 11px;
+	width: 120px;
+}
+
+.portBeschriftungRechts input {
+	float: right;
+}
+
+.portBeschriftung select {
+	background-color: #3498DB;
+	color: white;
+	border: none;
+	hyphens: auto;
+	cursor: pointer;
+	width: 90px;
+	height: 12px;
+	font-size: 10px;
+}
+
+.portBeschriftungRechts select {
+	float: right;
+}
+
+.rand>button {
+	background-color: #3498DB;
+	color: white;
+	border: none;
+	hyphens: auto;
+	cursor: pointer;
+	position: absolute;
+	bottom: 2px;
+	left: 50%;
+	width: 100px;
+	font-size: 12px;
+	transform: translate(-50%, 0);
+}
+
+#trash {
+	height: 70px;
+	right: 110;
+	bottom: 0;
+	position: absolute;
+}
+
+.unsichtbar {
+	visibility: hidden;
+}
+
+.trashtarget {
+	background-color: red;
+}
 </style>
-<script>
+<script type="text/javascript">
     //Onlinetest
     //CLient Kommentar 2
     //Remote Branch Kommentar
@@ -322,9 +334,8 @@ body{
     
     const urlParams = new URLSearchParams(window.location.search);
     
-    
     if(urlParams.has('sys')){
-        document.getElementById("sys1Beschreibung").innerHTML = urlParams.get('nr') + "<br>" + urlParams.get('sys');
+      	document.getElementById("sys1Beschreibung").innerHTML = urlParams.get('nr') + "<br>" + urlParams.get('sys');
     }
     else{
         alert("es wurde kein System ausgewählt! Bitte in der Bauspec erst ein Artefakt eines Baugruppen-Kapitel auswählen und dialog erneut öffnen!");
@@ -534,6 +545,7 @@ body{
     		source.addEventListener("dragend", (event) => {
     		  // reset the transparency
     		  event.target.classList.remove("dragging");
+    		  trash.classList.add("unsichtbar");
     		  console.log("removed dragging");
     		});
     	}
@@ -557,6 +569,13 @@ body{
     		    event.target.classList.add("dragging");
     		    console.log("added dragging");
     		});
+            
+            target.addEventListener("dragend", (event) => {
+      		  // reset the transparency
+      		  event.target.classList.remove("dragging");
+      		  trash.classList.add("unsichtbar");
+      		  console.log("removed dragging");
+      		});
 
     		target.addEventListener("dragenter", (event) => {
                 console.log("dragenter vor if");
@@ -590,12 +609,13 @@ body{
 
             
     	}
+    	
     	trash.addEventListener("dragover",function(ereignis){
             ereignis.preventDefault();
             ereignis.dataTransfer.dropEffect = "move";
         });
         
-         trash.addEventListener("drop",function(ereignis){
+        trash.addEventListener("drop",function(ereignis){
              ereignis.preventDefault;
              trash.classList.add("unsichtbar");
              const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
@@ -623,12 +643,19 @@ body{
              
          });
        
-         trash.addEventListener("dragenter", function(ereignis){
-             trash.classList.add("trashtarget");
-         });
+        trash.addEventListener("dragenter", function(ereignis){
+        	trash.classList.add("trashtarget");
+        });
+         
+         trash.addEventListener("dragleave", (event) => {
+   		  // reset background of potential drop target when the draggable element leaves it
+   		   event.target.classList.remove("trashtarget");
+   		   console.log("dragleave");
+   		});
     }
 
 
+    
     function savePorts(event){
         console.log('TargetClassnames ' + event.srcElement.className);
         console.log('SourceClassnames ' + dragged.className);
@@ -737,3 +764,4 @@ body{
    
 
 </script>
+
