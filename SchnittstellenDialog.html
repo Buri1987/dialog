@@ -32,11 +32,6 @@
 			<button
 				onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send
 				to Widget</button>
-			<div id="grid-fuer-canvas">
-				<div id="div-fuer-canvas">
-					<canvas id="canvasConnectoren"></canvas>
-				</div>
-			</div>
 		</div>
 	</div>
 </body>
@@ -343,10 +338,20 @@ body {
 
     var anzahlPortsLinks = 0;
     var anzahlPortsLinksfuerPositionNachLoeschen = 0;
+    var portsLinks = new Map();
     function portHinzufuegenLinks(){
+    	
+    	if(portsLinks.size > 0){
+    		var test = portsLinks.forEach(function(element, key, map){
+    			if(element == null){
+	    			return key;
+    			}
+    		});
+    	}
+    	
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" class="port portLinks"></div>'+
-                    '<div id="portBeschriftung1'+anzahlPortsLinks+'" class="portBeschriftung portBeschriftungLinks">'+
+        let htmlCode =  '<div id="port1'+portsLinks.size+'" draggable="true" class="port portLinks"></div>'+
+                    '<div id="portBeschriftung1'+portsLinks.size+'" class="portBeschriftung portBeschriftungLinks">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
@@ -361,18 +366,20 @@ body {
         $("#portContainerLinks").append(html);
 
         //2. Ports gleichmaeßig verteilen:
-        if (anzahlPortsLinksfuerPositionNachLoeschen == 0) {
+        if (portsLinks.size == 0) {
             document.getElementById('port10').style.top = "50%";
             document.getElementById('portBeschriftung10').style.top = "50%";
         } else {
-            for (let index = 0; index <= anzahlPortsLinksfuerPositionNachLoeschen; index++) {
+            for (let index = 0; index <= portsLinks.size; index++) {
                 let id = index;
                 if(document.getElementById('port1'+id)){
-                    document.getElementById('port1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
-                    document.getElementById('portBeschriftung1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
+                    document.getElementById('port1'+id).style.top = index/portsLinks.size*100+'%';
+                    document.getElementById('portBeschriftung1'+id).style.top = index/portsLinks.size*100+'%';
                 }
             } 
         }
+        portsLinks.set(html[0].id,html[0]);
+
         anzahlPortsLinks++;
         anzahlPortsLinksfuerPositionNachLoeschen++;
         setEventListeners(html);
@@ -381,6 +388,7 @@ body {
     
     var anzahlPortsRechts = 0;
     var anzahlPortsRechtsFuerPositionNachLoeschen = 0;
+    var portsRechts = new Map();
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts" ></div>'+
@@ -434,11 +442,11 @@ body {
     /*function lineDragAni(event){
         //console.log(event);
         zeichneLinie(event.x, event.y)
-    }*/
+    }
 
     var c = document.getElementById("canvasConnectoren");
     var ctx = c.getContext("2d");
-/*
+
     function zeichneLinie(x,y){
         ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         ctx.beginPath();
@@ -446,14 +454,14 @@ body {
         ctx.lineTo(xUmrechnen(x-c.getBoundingClientRect().x), yUmrechnen(y-c.getBoundingClientRect().y));
         ctx.stroke();
     }
-*/
+
     function xUmrechnen(x){
         return x*ctx.canvas.width/c.clientWidth;
     }
 
     function yUmrechnen(y){
         return y*ctx.canvas.height/c.clientHeight;
-    }
+    }*/
 
     //Funktion macht beispielsweise aus "3100" Folgendes: "BL_BA_3100" um der MBSE-Namenskonvention zu entsprechen:
     function getBlockname(baugruppennummer){
@@ -468,6 +476,7 @@ body {
         }else{
             bgArt = "BGR";
         }
+       
 
         return "BL_"+bgArt+"_"+baugruppennummer; 
     }
@@ -519,14 +528,16 @@ body {
           }
          }
          if(gezogenesElement){
-            if(ausgeleseneID[4]==1){
-               anzahlPortsLinksfuerPositionNachLoeschen--;
+            if(portsLinks.has(gezogenesElement.id)){
+            	portsLinks.set(gezogenesElement.id, null);
+            	gezogenesElement.remove();
+            	gezogeneKinder.remove();
             }
             if(ausgeleseneID[4]==2){
                anzahlPortsRechtsFuerPositionNachLoeschen--;
+               gezogenesElement.remove();
+               gezogeneKinder.remove();
             }
-            gezogenesElement.remove();
-            gezogeneKinder.remove();
         }
          
      });
@@ -553,7 +564,6 @@ body {
         var trash = document.getElementById("trash");
         if(html[0].classList == "port portLinks"){
     		// events fired on the draggable target
-    		//source = sources[i];
     		var source = html[0];
     		source.addEventListener("drag", (event) => {
     			event.preventDefault();
@@ -575,6 +585,9 @@ body {
     		source.addEventListener("dragend", (event) => {
     		  // reset the transparency
     		  event.target.classList.remove("dragging");
+    		  if(document.getElementById(event.srcElement.id + '_Linie')){
+    		  	document.getElementById(event.srcElement.id + '_Linie').remove();
+    		  }
     		  trash.classList.add("unsichtbar");
     		  console.log("removed dragging");
     		});
@@ -685,7 +698,6 @@ body {
     	endPoint.y = event.clientY;
     	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
-    	//let neueLinie = document.querySelector('#newLine');
     	var neueLinie = document.getElementById(event.srcElement.id + '_Linie');
     	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
     	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
