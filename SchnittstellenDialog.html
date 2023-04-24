@@ -336,23 +336,36 @@ body {
         //alert("es wurde kein System ausgewählt! Bitte in der Bauspec erst ein Artefakt eines Baugruppen-Kapitel auswählen und dialog erneut öffnen!");
     }
 
-    var anzahlPortsLinks = 0;
-    var anzahlPortsLinksfuerPositionNachLoeschen = 0;
+
     var portsLinks = new Map();
     function portHinzufuegenLinks(){
     	
-    	var test;
+    	var portNameLinks;
+    	
+    	//Finden von Key mit value null
     	if(portsLinks.size > 0){
     		portsLinks.forEach(function(element, key, map){
     			if(element == null){
-	    			test = key;
+    				portNameLinks = key;
     			}
     		});
     	}
+
+    	if(!portNameLinks){
+    		portNameLinks = "port1" + portsLinks.size;
+    	}
+    	
+    	
+    	//Regulärer Ausdruck zum finden von Nummern
+    	var regex = /\d+/g;
+    	
+    	var portNummer = portNameLinks.match(regex);
+    	
+    	var portBeschriftungNameLinks = "portBeschriftung" + portNummer;
     	
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port1'+portsLinks.size+'" draggable="true" class="port portLinks"></div>'+
-                    '<div id="portBeschriftung1'+portsLinks.size+'" class="portBeschriftung portBeschriftungLinks">'+
+        let htmlCode =  '<div id="' + portNameLinks + '" draggable="true" class="port portLinks"></div>'+
+                    '<div id="' + portBeschriftungNameLinks + '" class="portBeschriftung portBeschriftungLinks">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
@@ -372,6 +385,8 @@ body {
             document.getElementById('port10').style.top = "50%";
             document.getElementById('portBeschriftung10').style.top = "50%";
         } else {
+        	
+        	
             for (let index = 0; index <= portsLinks.size; index++) {
                 let id = index;
                 if(document.getElementById('port1'+id)){
@@ -382,11 +397,10 @@ body {
         }
         portsLinks.set(html[0].id,html[0]);
 
-        anzahlPortsLinks++;
-        anzahlPortsLinksfuerPositionNachLoeschen++;
         setEventListeners(html);
         updateSVGLine();
     }
+    
     
     var anzahlPortsRechts = 0;
     var anzahlPortsRechtsFuerPositionNachLoeschen = 0;
