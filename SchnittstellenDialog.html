@@ -323,10 +323,7 @@ body {
 }
 </style>
 <script type="text/javascript">
-    //Onlinetest
-    //CLient Kommentar 2
-    //Remote Branch Kommentar
-    //Client Branch Kommentar
+
     window.name = "Schnittstellendialog";
     window.addEventListener("message", async function(event) {
                             
@@ -344,12 +341,36 @@ body {
         //alert("es wurde kein System ausgewählt! Bitte in der Bauspec erst ein Artefakt eines Baugruppen-Kapitel auswählen und dialog erneut öffnen!");
     }
 
-    var anzahlPortsLinks = 0;
-    var anzahlPortsLinksfuerPositionNachLoeschen = 0;
+
+    var portsLinks = new Map();
     function portHinzufuegenLinks(){
+    	
+    	var portNameLinks;
+    	
+    	//Finden von Key mit value null
+    	if(portsLinks.size > 0){
+    		portsLinks.forEach(function(element, key, map){
+    			if(element == null){
+    				portNameLinks = key;
+    			}
+    		});
+    	}
+
+    	if(!portNameLinks){
+    		portNameLinks = "port1" + portsLinks.size;
+    	}
+    	
+    	
+    	//Regulärer Ausdruck zum finden von Nummern
+    	var regex = /\d+/g;
+    	
+    	var portNummer = portNameLinks.match(regex);
+    	
+    	var portBeschriftungNameLinks = "portBeschriftung" + portNummer;
+    	
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
-        let htmlCode =  '<div id="port1'+anzahlPortsLinks+'" draggable="true" class="port portLinks"></div>'+
-                    '<div id="portBeschriftung1'+anzahlPortsLinks+'" class="portBeschriftung portBeschriftungLinks">'+
+        let htmlCode =  '<div id="' + portNameLinks + '" draggable="true" class="port portLinks"></div>'+
+                    '<div id="' + portBeschriftungNameLinks + '" class="portBeschriftung portBeschriftungLinks">'+
                     '   <input type="text" placeholder="Schnittstelle benennen!">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
@@ -363,26 +384,35 @@ body {
         let html = $.parseHTML(htmlCode);
         $("#portContainerLinks").append(html);
 
+        //checken für leere values in map
         //2. Ports gleichmaeßig verteilen:
-        if (anzahlPortsLinksfuerPositionNachLoeschen == 0) {
+        if (portsLinks.size == 0) {
             document.getElementById('port10').style.top = "50%";
             document.getElementById('portBeschriftung10').style.top = "50%";
         } else {
-            for (let index = 0; index <= anzahlPortsLinksfuerPositionNachLoeschen; index++) {
+        	
+        	
+            for (let index = 0; index <= portsLinks.size; index++) {
+            	if(portsLinks.get("port1" + index)){
+            		portsLinks.get("port1" + index).style.top = index
+            	}
                 let id = index;
                 if(document.getElementById('port1'+id)){
-                    document.getElementById('port1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
-                    document.getElementById('portBeschriftung1'+id).style.top = index/anzahlPortsLinksfuerPositionNachLoeschen*100+'%';
+                    document.getElementById('port1'+id).style.top = index/portsLinks.size*100+'%';
+                    document.getElementById('portBeschriftung1'+id).style.top = index/portsLinks.size*100+'%';
                 }
             } 
         }
-        anzahlPortsLinks++;
-        anzahlPortsLinksfuerPositionNachLoeschen++;
+        portsLinks.set(html[0].id,html[0]);
+
         setEventListeners(html);
         updateSVGLine();
     }
+    
+    
     var anzahlPortsRechts = 0;
     var anzahlPortsRechtsFuerPositionNachLoeschen = 0;
+    var portsRechts = new Map();
     function portHinzufuegenRechts(){
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="port2'+anzahlPortsRechts+'" draggable="true" class="port portRechts" ></div>'+
@@ -419,6 +449,7 @@ body {
         setEventListeners(html);
         updateSVGLine();
     }
+    
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
         document.getElementById('rechtesSystem').classList.remove('sysNichtZugeordnet');
@@ -435,11 +466,11 @@ body {
     /*function lineDragAni(event){
         //console.log(event);
         zeichneLinie(event.x, event.y)
-    }*/
+    }
 
     var c = document.getElementById("canvasConnectoren");
     var ctx = c.getContext("2d");
-/*
+
     function zeichneLinie(x,y){
         ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         ctx.beginPath();
@@ -447,14 +478,14 @@ body {
         ctx.lineTo(xUmrechnen(x-c.getBoundingClientRect().x), yUmrechnen(y-c.getBoundingClientRect().y));
         ctx.stroke();
     }
-*/
+
     function xUmrechnen(x){
         return x*ctx.canvas.width/c.clientWidth;
     }
 
     function yUmrechnen(y){
         return y*ctx.canvas.height/c.clientHeight;
-    }
+    }*/
 
     //Funktion macht beispielsweise aus "3100" Folgendes: "BL_BA_3100" um der MBSE-Namenskonvention zu entsprechen:
     function getBlockname(baugruppennummer){
@@ -469,6 +500,7 @@ body {
         }else{
             bgArt = "BGR";
         }
+       
 
         return "BL_"+bgArt+"_"+baugruppennummer; 
     }
@@ -520,14 +552,16 @@ body {
           }
          }
          if(gezogenesElement){
-            if(ausgeleseneID[4]==1){
-               anzahlPortsLinksfuerPositionNachLoeschen--;
+            if(portsLinks.has(gezogenesElement.id)){
+            	portsLinks.set(gezogenesElement.id, null);
+            	gezogenesElement.remove();
+            	gezogeneKinder.remove();
             }
             if(ausgeleseneID[4]==2){
                anzahlPortsRechtsFuerPositionNachLoeschen--;
+               gezogenesElement.remove();
+               gezogeneKinder.remove();
             }
-            gezogenesElement.remove();
-            gezogeneKinder.remove();
         }
          
      });
@@ -548,14 +582,12 @@ body {
     let svgArtboard = document.querySelector('#svgArtboard');
     let startPoint = svgArtboard.createSVGPoint();
     let endPoint = svgArtboard.createSVGPoint();
-    var source;
-    var target;
+    let dragged;
 
     function setEventListeners(html){
         var trash = document.getElementById("trash");
         if(html[0].classList == "port portLinks"){
     		// events fired on the draggable target
-    		//source = sources[i];
     		var source = html[0];
     		source.addEventListener("drag", (event) => {
     			event.preventDefault();
@@ -577,6 +609,9 @@ body {
     		source.addEventListener("dragend", (event) => {
     		  // reset the transparency
     		  event.target.classList.remove("dragging");
+    		  if(document.getElementById(event.srcElement.id + '_Linie')){
+    		  	document.getElementById(event.srcElement.id + '_Linie').remove();
+    		  }
     		  trash.classList.add("unsichtbar");
     		  console.log("removed dragging");
     		});
@@ -648,6 +683,7 @@ body {
         console.log('TargetId ' + event.srcElement.id);
         console.log('SourceId ' + dragged.id);
     }
+    
 
     function saveLine(event){
         var svgLinie = document.getElementById(dragged.id + '_Linie');
@@ -660,6 +696,7 @@ body {
         }
     }
 
+    
     function drawDraggableSVGLine(event){
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
@@ -685,7 +722,6 @@ body {
     	endPoint.y = event.clientY;
     	let svgStartPoint = startPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
     	let svgEndPoint = endPoint.matrixTransform(svgArtboard.getScreenCTM().inverse());
-    	//let neueLinie = document.querySelector('#newLine');
     	var neueLinie = document.getElementById(event.srcElement.id + '_Linie');
     	neueLinie.setAttribute("x1", Math.round(svgStartPoint.x));
     	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
@@ -696,6 +732,7 @@ body {
     	console.log(xCoord, yCoord);
     	console.log(event.screenX,event.screenY);
     }
+    
     
     function updateSVGLine(){
     	var svgLines = document.getElementsByClassName("svgConnectors");
@@ -744,7 +781,6 @@ body {
     	}
     }
 
-    let dragged;
 
 
    
