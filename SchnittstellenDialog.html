@@ -29,9 +29,9 @@
 				<div>?</div>
 			</div>
 			<img id="trash" src="Images/Trash.png" class="unsichtbar">
-			<button onclick="top.window.postMessage({name: 'Load from DB not yet availible'}, '*');">Bestehende Daten Laden</button>
-			<button onclick="top.window.postMessage({name: 'refresh not yet availible'}, '*');">Ansicht aktualisieren</button>
-			<button onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send	to Widget</button>
+			<button id = "load" onclick="top.window.postMessage({name: 'Load from DB not yet availible'}, '*');">Bestehende Daten Laden</button>
+			<button id = "refresh" onclick="top.window.postMessage({name: 'refresh not yet availible'}, '*');">Ansicht aktualisieren</button>
+			<button id = "send" onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send	to Widget</button>
 			<div id="grid-fuer-canvas">
 				<div id="div-fuer-canvas">
 					<canvas id="canvasConnectoren"></canvas>
