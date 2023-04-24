@@ -315,7 +315,7 @@ body {
 
 
     var portsLinks = new Map();
-    function portHinzufuegenLinks(){
+    function portHinzufuegenLinks(schnittstellenname){
     	
     	var portNameLinks;
     	
@@ -360,12 +360,21 @@ body {
         //Map der PortsLinks updaten
         portsLinks.set(html[0].id,html[0]);
 
-        //2. Ports gleichmaeßig verteilen:
+        //Ports gleichmaeßig verteilen:
        	updatePortsLinksPosition();
         setEventListeners(html);
         updateSVGLine();
     }
     
+    
+    /*  
+    * Position der Ports auf der linken Seite wird upgedated
+    * Es wird durch die map portsLinks itereriert und einem Array
+    * an vorhandenen Ports der Key hinzugefügt wenn ein Port vorhanden ist.
+    * Danach kann mit diesen Keys über die map die Position aller vorhandenen
+    * Ports iteriert werden.
+    *
+    */
     function updatePortsLinksPosition(){
     	const iteratorPortsLinks = portsLinks[Symbol.iterator]();
        	let vorhandenePortsLinksKeys = new Array();
@@ -433,14 +442,25 @@ body {
         //Map der PortsLinks updaten
         portsRechts.set(html[0].id,html[0]);
         
-        //2. Ports gleichmaeßig verteilen:
+        //Ports gleichmaeßig verteilen:
         updatePortsRechtsPosition();
         
+        //Eventlisteners den Ports hinzufügen
         setEventListeners(html);
         
+        //Position der svg Lines updaten
         updateSVGLine();
     }
     
+    
+    /*  
+     * Position der Ports auf der rechten Seite wird upgedated
+     * Es wird durch die map portsLinks itereriert und einem Array
+     * an vorhandenen Ports der Key hinzugefügt wenn ein Port vorhanden ist.
+     * Danach kann mit diesen Keys über die map die Position aller vorhandenen
+     * Ports iteriert werden.
+     *
+     */
     function updatePortsRechtsPosition(){
     	const iteratorPortsRechts = portsRechts[Symbol.iterator]();
        	let vorhandenePortsRechtsKeys = new Array();
@@ -461,6 +481,7 @@ body {
        	}
     }
     
+    
     function setSys2(sysName){
         //Formatierung von Sys undefiniert auf Sys definert ändern:
         document.getElementById('rechtesSystem').classList.remove('sysNichtZugeordnet');
@@ -475,7 +496,10 @@ body {
     }
 
 
-    //Funktion macht beispielsweise aus "3100" Folgendes: "BL_BA_3100" um der MBSE-Namenskonvention zu entsprechen:
+    /*Funktion macht beispielsweise aus "3100" Folgendes: "BL_BA_3100" um der MBSE-Namenskonvention zu entsprechen:
+    * mit baugruppennummer als String
+    *
+    */
     function getBlockname(baugruppennummer){
 
         let bgArt = "";
@@ -503,6 +527,7 @@ body {
 
     function portsAbfragen(){
         top.window.postMessage({getPorts: [urlParams.get('nr'),urlParams.get('sys')]}, '*');
+        console.log("ports");
     }
     
     
@@ -521,8 +546,8 @@ body {
          ereignis.target.classList.remove("trashtarget");
          const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
          const gezogenesElement = document.getElementById(ausgeleseneID);
-         const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
-         const gezogeneKinder = document.getElementById(ausgeleseneKinder);
+         //const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
+         //const gezogeneKinder = document.getElementById(ausgeleseneKinder);
          var svgLines = document.getElementsByClassName("svgConnectors");
          var gezogenesElementID;
          if(gezogenesElement){
@@ -541,21 +566,17 @@ body {
           	}
           }
          }
+         //Überprüfen ob der das gezogenen Element existiert und welcher Seite es angehört
          if(gezogenesElement){
             if(portsLinks.has(gezogenesElement.id)){
             	portsLinks.set(gezogenesElement.id, null);
             	gezogenesElement.remove();
-            	gezogeneKinder.remove();
+            	//gezogeneKinder.remove();
             }
             if(portsRechts.has(gezogenesElement.id)){
             	portsRechts.set(gezogenesElement.id, null);
             	gezogenesElement.remove();
-            	gezogeneKinder.remove();
-            }
-            if(ausgeleseneID[4]==2){
-               anzahlPortsRechtsFuerPositionNachLoeschen--;
-               gezogenesElement.remove();
-               gezogeneKinder.remove();
+            	//gezogeneKinder.remove();
             }
         }
          
