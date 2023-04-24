@@ -341,10 +341,11 @@ body {
     var portsLinks = new Map();
     function portHinzufuegenLinks(){
     	
+    	var test;
     	if(portsLinks.size > 0){
-    		var test = portsLinks.forEach(function(element, key, map){
+    		portsLinks.forEach(function(element, key, map){
     			if(element == null){
-	    			return key;
+	    			test = key;
     			}
     		});
     	}
@@ -365,6 +366,7 @@ body {
         let html = $.parseHTML(htmlCode);
         $("#portContainerLinks").append(html);
 
+        //checken für leere values in map
         //2. Ports gleichmaeßig verteilen:
         if (portsLinks.size == 0) {
             document.getElementById('port10').style.top = "50%";
