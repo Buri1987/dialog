@@ -296,7 +296,7 @@ body {
 </style>
 <script type="text/javascript">
 
-//Kleiner Bildschirm
+
     window.name = "Schnittstellendialog";
     window.addEventListener("message", async function(event) {
                             
@@ -414,7 +414,6 @@ body {
     	if(!portNameRechts){
     		portNameRechts = "port2" + portsRechts.size;
     	}
-    	
     	
     	//Regulärer Ausdruck zum finden von Nummern
     	var regex = /\d+/g;
@@ -693,15 +692,26 @@ body {
     }
 
 
-    
+    /*
+    * Abspeichern des Portnamens aus dem Beschreibungstext des Kindelements der Ports
+    *
+    */
     function savePorts(event){
+    	console.log('TargetPortName ' + event.srcElement.children[0].innerHTML.slice(event.srcElement.children[0].innerHTML.indexOf("placeholder")+13,event.srcElement.children[0].innerHTML.indexOf("\">")))
         console.log('TargetClassnames ' + event.srcElement.className);
-        console.log('SourceClassnames ' + dragged.className);
         console.log('TargetId ' + event.srcElement.id);
-        console.log('SourceId ' + dragged.id);
+        console.log('SourcePortName ' + dragged.children[0].innerHTML.slice(dragged.children[0].innerHTML.indexOf("placeholder")+13,dragged.children[0].innerHTML.indexOf("\">")));
+        console.log('SourceClassnames ' + dragged.className);
+        console.log('SourceId ' + dragged.id);  
     }
     
 
+    
+    /*
+    * Funktion zur Speichern des Connectornamens in der ID der Line
+    * StartId_ZielID_Linie
+    *
+    */
     function saveLine(event){
         var svgLinie = document.getElementById(dragged.id + '_Linie');
         if(!svgLinie){
@@ -714,9 +724,12 @@ body {
     }
 
     
+    
     function drawDraggableSVGLine(event){
+    	//Holen der Linie welche nur mit gezogenem Port verbunden ist
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
     	var svgLinieName;
+    	//Falls keine Linie vorhanden neues SVG Element in oberer linker Ecke erstellen
     	if(!svgLinie){
     		svgLinieName = event.srcElement.id + '_Linie';
     		d3.select("#svgArtboard").append("line")
@@ -730,9 +743,11 @@ body {
             .attr("y2", 0); ;
     	}
     	
+    	//Finden des Mittelpunkts des gezogenen Startports
     	var rect = event.srcElement.getBoundingClientRect();
     	let xCoord = Math.round(((rect.right - rect.left) / 2 ) + rect.left);
     	let yCoord = Math.round(((rect.bottom - rect.top) / 2 ) + rect.top);
+    	//Setzen der Startkoordinaten auf Mittelpunkt des Startports
     	startPoint.x = xCoord;
     	startPoint.y = yCoord;
     	endPoint.x = event.clientX;
