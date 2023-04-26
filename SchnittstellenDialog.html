@@ -313,10 +313,46 @@ body {
     	//alert auskommentiert für entwicklung
         //alert("es wurde kein System ausgewählt! Bitte in der Bauspec erst ein Artefakt eines Baugruppen-Kapitel auswählen und dialog erneut öffnen!");
     }
+    
+    
+    var testJSON = '{"2472":["PP_2500","PP_2500"],"2500":["PP_2472","PP_2472"]}';
+    
+    function init(jsonString){
+    	var text = JSON.parse(jsonString);
+    	
+    	//Regulärer Ausdruck zum finden von Nummern
+    	var regex = /\d+/g;
+    	var linkeMBGVNummer = document.getElementById('linkesSystem').innerText.match(regex);
+    	var rechteMBGVNummer = document.getElementById('rechtesSystem').innerText.match(regex);
+    	if(text[linkeMBGVNummer]){
+    		for(let i = 0; i < text[linkeMBGVNummer].length; i++){
+    			portHinzufuegenLinks(text[linkeMBGVNummer][i]);
+    		}
+    		console.log("nö");
+    	}
+    	else{
+    		
+    		console.log("jo");
+    	}
+    	if(text[rechteMBGVNummer]){
+    		for(let i = 0; i < text[rechteMBGVNummer].length; i++){
+    			portHinzufuegenRechts(text[rechteMBGVNummer][i]);
+    		}
+    		console.log("nö");
+    	}
+    	else{
+    		
+    		console.log("jo");
+    	}
+    	
+    }
 
 
     var portsLinks = new Map();
     function portHinzufuegenLinks(schnittstellenname){
+    	if(!schnittstellenname){
+    		schnittstellenname = "";
+    	}
     	
     	var portNameLinks;
     	
@@ -344,7 +380,7 @@ body {
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="' + portNameLinks + '" draggable="true" class="port portLinks">'+
                     '<div id="' + portBeschriftungNameLinks + '" class="portBeschriftung portBeschriftungLinks">'+
-                    '   <input type="text" placeholder="Schnittstelle benennen!">'+
+                    '   <input type="text" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
                     '       <option>Elektrisch</option>'+
@@ -398,7 +434,11 @@ body {
     
 
     var portsRechts = new Map();
-    function portHinzufuegenRechts(){
+    function portHinzufuegenRechts(schnittstellenname){
+    	
+    	if(!schnittstellenname){
+    		schnittstellenname = "";
+    	}
     	
 		var portNameRechts;
     	
@@ -425,7 +465,7 @@ body {
         //1. HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="' + portNameRechts + '" draggable="true" class="port portRechts" >'+
                     '<div id="' + portBeschriftungNameRechts + '" class="portBeschriftung portBeschriftungRechts">'+
-                    '   <input type="text" placeholder="Schnittstelle benennen!">'+
+                    '   <input type="text" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
                     '       <option>Elektrisch</option>'+
