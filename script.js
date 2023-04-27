@@ -30,8 +30,7 @@
         //alert("es wurde kein System ausgewählt! Bitte in der Bauspec erst ein Artefakt eines Baugruppen-Kapitel auswählen und dialog erneut öffnen!");
     }
     
-    
-    
+  
     function init(jsonString){
     	var text = JSON.parse(jsonString);
     	
@@ -88,7 +87,7 @@
     	
     	//Finden von Key mit value null
     	if(portsLinks.size > 0){
-    		portsLinks.forEach(function(element, key, map){
+    		portsLinks.forEach(function(element, key){
     			if(element == null){
     				portNameLinks = key;
     			}
@@ -195,7 +194,7 @@
     	
     	//Finden von Key mit value null
     	if(portsRechts.size > 0){
-    		portsRechts.forEach(function(element, key, map){
+    		portsRechts.forEach(function(element, key){
     			if(element == null){
     				portNameRechts = key;
     			}
@@ -486,6 +485,8 @@
     /*
     * Abspeichern des Portnamens aus dem Beschreibungstext des Kindelements der Ports
     *
+	* Input: event zur Untersuchung der Target ids
+	* 
     */
     function savePorts(event){
     	console.log('TargetPortName ' + event.srcElement.children[0].innerHTML.slice(event.srcElement.children[0].innerHTML.indexOf("placeholder")+13,event.srcElement.children[0].innerHTML.indexOf("\">")))
@@ -559,7 +560,6 @@
     
     function updateSVGLine(){
     	var svgLines = document.getElementsByClassName("svgConnectors");
-    	var svgLinieName;
     	if(!svgLines){
     		
     	}
