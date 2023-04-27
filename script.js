@@ -558,6 +558,8 @@
     }
     
     
+    
+    
     function updateSVGLine(){
     	var svgLines = document.getElementsByClassName("svgConnectors");
     	if(!svgLines){
