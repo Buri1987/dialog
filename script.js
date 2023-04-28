@@ -606,6 +606,113 @@
     	}
     }
 
+/*{
+	"Partname":
+		{
+			"Portname":
+				{
+					"label":"label in Rhapsody";
+					"interfaceBlock":"interfaceBlockname",
+					"direction":"which direction",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"startpartname",
+								"to":"stoppartname",
+								"name":"connectorname"
+							}
+				}
+		}
+}
 
+
+your example
+
+{
+	"PT_HBGR_2620":
+		{
+			"Port123":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"StubInterfaceBlock",
+					"direction":"bidirectional",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_BGR_2441_portC",
+								"to":"PT_HBGR_2620_Port123",
+								"name":"PT_BGR_2441_PT_Verstellpropeller"
+							}
+				},
+			"Aufnahme":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"IB_Welle",
+					"direction":"in",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_BGR_2441_portB",
+								"to":"PT_HBGR_2620_Aufnahme",
+								"name":"PT_BGR_2441_PT_Verstellpropeller"
+							}
+				},
+			"Proxyport_5":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"StubInterfaceBlock",
+					"direction":"bidirectional",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_HBGR_2620_Proxyport_5",
+								"to":"PT_BGR_2441_portA",
+								"name":"PT_Verstellpropeller_PT_BGR_2441"
+							}
+				}
+		},
+	"PT_BGR_2441":
+		{
+			"portC":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"StubInterfaceBlock",
+					"direction":"bidirectional",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_BGR_2441_portC",
+								"to":"PT_HBGR_2620_Port123",
+								"name":"PT_BGR_2441_PT_Verstellpropeller"
+							}
+				},
+			"portA":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"IB_Welle",
+					"direction":"in",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_HBGR_2620_Proxyport_5",
+								"to":"PT_BGR_2441_portA",
+								"name":"PT_Verstellpropeller_PT_BGR_2441"
+							}
+				},
+			"portB":
+				{
+					"label":"label in Rhapsody",
+					"interfaceBlock":"IB_Welle",
+					"direction":"in",
+					"multiplicity":"1",
+					"connectors":
+							{
+								"from":"PT_BGR_2441_portB",
+								"to":"PT_HBGR_2620_Aufnahme",
+								"name":"PT_BGR_2441_PT_Verstellpropeller"
+							}
+				}
+		}
+}*/
 
    
