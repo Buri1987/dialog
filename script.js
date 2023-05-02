@@ -13,7 +13,23 @@
     * Globale Variablen
     */
     const urlParams = new URLSearchParams(window.location.search);
-    var testJSON = '{"2472":["PP_2500","PP_2500"],"2500":["PP_2472","PP_2472"]}';
+    const 
+    const testObject = {
+		"PT_BGR_2472":{
+			"PP_2500":{
+				"label":"Stromzufuhr",
+				"interfaceBlock":"IB_elektrisch",
+				"direction":"in",
+				"multiplicity":"1",
+				"connectors":{
+					"from":"",
+					"to":"",
+					"name":""
+				}
+			}
+		}
+	};
+    var testJSON = '{"Partname":{"Portname":{"label":"label in Rhapsody","interfaceBlock":"interfaceBlockname","direction":"which direction","multiplicity":"1","connectors":{"from":"startpartname","to":"stoppartname","name":"connectorname"}}}}';
     var portsLinks = new Map();
     var portsRechts = new Map();
     let svgArtboard = document.querySelector('#svgArtboard');
