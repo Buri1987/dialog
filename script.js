@@ -17,10 +17,10 @@
     const testObject = {
 		"PT_BGR_2472":{
 			"PP_2500":{
-				"label":"Stromzufuhr",
-				"interfaceBlock":"IB_elektrisch",
-				"direction":"in",
-				"multiplicity":"1",
+				"label":"",
+				"interfaceBlock":"",
+				"direction":"",
+				"multiplicity":"",
 				"connectors":{
 					"from":"",
 					"to":"",
