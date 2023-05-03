@@ -3,6 +3,8 @@
  */
 
     window.name = "Schnittstellendialog";
+    //message JSON für Kommunikation nach außen
+    //bsp: window.postMessage("test","*")
     window.addEventListener("message", async function(event) {
                             
         //1.3 Im Widget die empfangenen daten darstellen:
@@ -13,18 +15,77 @@
     * Globale Variablen
     */
     const urlParams = new URLSearchParams(window.location.search);
-    const 
+    
+    //Konstruktor für Parts das Array ports besteht aus portObjects
+    const partObject = {
+		name:"",
+		ports:[]
+	};
+	
+	//Konstruktor für Ports das Array connectors besteht aus connectorObjects
+	const portObject = {
+		name: "",
+		label: "",
+		interfaceBlock:"",
+		direction: "",
+		multiplicity:"",
+		connectors:[]
+	};
+		
+	//Konstruktor für Connectors
+	const connectorObject = {
+		from: "",
+		to: "",
+		name: ""
+	};
+	
+	//mehrere Ports in Array!!!!
     const testObject = {
-		"PT_BGR_2472":{
-			"PP_2500":{
-				"label":"",
-				"interfaceBlock":"",
-				"direction":"",
-				"multiplicity":"",
+		"PT_BGR_2472":[
+			{"PP_2500":{
+				"label":"linkesTestLabel",
+				"interfaceBlock":"IB_Daten",
+				"direction":"out",
+				"multiplicity":"1",
 				"connectors":{
-					"from":"",
-					"to":"",
-					"name":""
+					"from":"PT_BGR_2472_PP_2500",
+					"to":"PT_BA_2500_PP_2472",
+					"name":"testConnector"
+				}
+			}},
+			{"PP_2500":{
+				"label":"linkesTestLabel2",
+				"interfaceBlock":"IB_Elektrisch",
+				"direction":"out",
+				"multiplicity":"1",
+				"connectors":{
+					"from":"PT_BGR_2472_PP_2500",
+					"to":"PT_BA_2500_PP_2472",
+					"name":"testConnector2"
+				}
+			}}
+		],
+		"PT_BA_2500":{
+			"PP_2472":{
+				"label":"rechtsTestLabel",
+				"interfaceBlock":"IB_Daten",
+				"direction":"in",
+				"multiplicity":"1",
+				"connectors":{
+					"from":"PT_BGR_2472_PP_2500",
+					"to":"PT_BA_2500_PP_2472",
+					"name":"testConnector"
+				}
+			},
+			"PP_2472":{
+				"label":"rechtsTestLabel2",
+				"interfaceBlock":"IB_Elektrisch",
+				"direction":"in",
+				"multiplicity":"1",
+				"connectors":{
+					"from":"PT_BGR_2472_PP_2500",
+					"to":"PT_BA_2500_PP_2472",
+					"name":"testConnector2"
 				}
 			}
 		}
@@ -54,15 +115,28 @@
     	var regex = /\d+/g;
     	var linkeMBGVNummer = document.getElementById('linkesSystem').innerText.match(regex);
     	var rechteMBGVNummer = document.getElementById('rechtesSystem').innerText.match(regex);
+    	
+    	if(linkeMBGVNummer){
+			if(!isNaN(linkeMBGVNummer))
+			{
+				linkeMBGVNummer = getPartname(linkeMBGVNummer[0]);
+			}
+		}
+		if(rechteMBGVNummer){
+			if(!isNaN(rechteMBGVNummer))
+			{
+				rechteMBGVNummer = getPartname(rechteMBGVNummer[0]);
+			}
+		}
     	if(text[linkeMBGVNummer]){
     		for(let i = 0; i < text[linkeMBGVNummer].length; i++){
     			portHinzufuegenLinks(text[linkeMBGVNummer][i]);
     		}
-    		console.log("nö");
+    		console.log("jo");
     	}
     	else{
     		
-    		console.log("jo");
+    		console.log("nö");
     	}
     	if(text[rechteMBGVNummer]){
     		for(let i = 0; i < text[rechteMBGVNummer].length; i++){
@@ -325,6 +399,30 @@
 
         return "BL_"+bgArt+"_"+baugruppennummer; 
     }
+    
+    
+    /*Funktion macht beispielsweise aus "3100" Folgendes: "PT_BA_3100" um der MBSE-Namenskonvention zu entsprechen:
+    * mit baugruppennummer als String
+    *
+    */
+    function getPartname(baugruppennummer){
+
+        let bgArt = "";
+        if(baugruppennummer[1]=='0' && baugruppennummer[2]=='0' && baugruppennummer[3]=='0'){
+            bgArt = "HBA";
+        }else if(baugruppennummer[2]=='0' && baugruppennummer[3]=='0') {
+            bgArt = "BA";
+        }else if(baugruppennummer[3]=='0'){
+            bgArt = "HBGR";
+        }else{
+            bgArt = "BGR";
+        }
+       
+
+        return "PT_"+bgArt+"_"+baugruppennummer; 
+    } 
+    
+    
 
     bestehendePortsHolenUndDarstellen();
 
@@ -621,6 +719,11 @@
     		}
     	}
     }
+    
+    function createJSON(){
+		var svgLines = document.getElementsByClassName("svgConnectors");
+
+	}
 
 /*{
 	"Partname":
