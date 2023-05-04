@@ -8,8 +8,10 @@
     window.addEventListener("message", async function(event) {
                             
         //1.3 Im Widget die empfangenen daten darstellen:
-        setSys2(event.data.name);
+        //setSys2(event.data.name);
+        console.log(event.data.name);
     }); 
+    
     
     /*
     * Globale Variablen
@@ -41,66 +43,79 @@
 	
 	//mehrere Ports in Array!!!!
     const testObject = {
-		"PT_BGR_2472":[
-			{"PP_2500":{
-				"label":"linkesTestLabel",
-				"interfaceBlock":"IB_Daten",
-				"direction":"out",
-				"multiplicity":"1",
-				"connectors":{
-					"from":"PT_BGR_2472_PP_2500",
-					"to":"PT_BA_2500_PP_2472",
-					"name":"testConnector"
-				}
-			}},
-			{"PP_2500":{
-				"label":"linkesTestLabel2",
-				"interfaceBlock":"IB_Elektrisch",
-				"direction":"out",
-				"multiplicity":"1",
-				"connectors":{
-					"from":"PT_BGR_2472_PP_2500",
-					"to":"PT_BA_2500_PP_2472",
-					"name":"testConnector2"
-				}
-			}}
-		],
-		"PT_BA_2500":{
-			"PP_2472":{
-				"label":"rechtsTestLabel",
-				"interfaceBlock":"IB_Daten",
-				"direction":"in",
-				"multiplicity":"1",
-				"connectors":{
-					"from":"PT_BGR_2472_PP_2500",
-					"to":"PT_BA_2500_PP_2472",
-					"name":"testConnector"
+		"PT_HBGR_2130G":[
+			{
+				"PP_2500_1":{
+					"label":"linkesTestLabel",
+					"interfaceBlock":"IB_Daten",
+					"direction":"out",
+					"multiplicity":"1",
+					"connectors":{
+						"from":"PT_BGR_2472_PP_2500",
+						"to":"PT_BA_2500_PP_2472",
+						"name":"testConnector"
+					}
 				}
 			},
-			"PP_2472":{
-				"label":"rechtsTestLabel2",
-				"interfaceBlock":"IB_Elektrisch",
-				"direction":"in",
-				"multiplicity":"1",
-				"connectors":{
-					"from":"PT_BGR_2472_PP_2500",
-					"to":"PT_BA_2500_PP_2472",
-					"name":"testConnector2"
+			{
+				"PP_2500_2":{
+					"label":"linkesTestLabel2",
+					"interfaceBlock":"IB_Elektrisch",
+					"direction":"out",
+					"multiplicity":"1",
+					"connectors":{
+						"from":"PT_BGR_2472_PP_2500",
+						"to":"PT_BA_2500_PP_2472",
+						"name":"testConnector2"
+					}
 				}
 			}
-		}
+		],
+		"PT_BA_2500":[
+			{
+				"PP_2472_1":{
+					"label":"rechtsTestLabel",
+					"interfaceBlock":"IB_Daten",
+					"direction":"in",
+					"multiplicity":"1",
+					"connectors":{
+						"from":"PT_BGR_2472_PP_2500",
+						"to":"PT_BA_2500_PP_2472",
+						"name":"testConnector"
+					}
+				}
+			},
+			{
+				"PP_2472_2":{
+					"label":"rechtsTestLabel2",
+					"interfaceBlock":"IB_Elektrisch",
+					"direction":"in",
+					"multiplicity":"1",
+					"connectors":{
+						"from":"PT_BGR_2472_PP_2500",
+						"to":"PT_BA_2500_PP_2472",
+						"name":"testConnector2"
+					}
+				}
+			}
+		]
 	};
     var testJSON = '{"Partname":{"Portname":{"label":"label in Rhapsody","interfaceBlock":"interfaceBlockname","direction":"which direction","multiplicity":"1","connectors":{"from":"startpartname","to":"stoppartname","name":"connectorname"}}}}';
+    //Maps für die Speicherung der Ports HTML-Objekte auch für die spätere Positionierung
     var portsLinks = new Map();
     var portsRechts = new Map();
     let svgArtboard = document.querySelector('#svgArtboard');
     let startPoint = svgArtboard.createSVGPoint();
     let endPoint = svgArtboard.createSVGPoint();
     let dragged = document.createElement("div");
+    var linkesSystemNummer = new String("");
+    var linkesSystemName = "";
+    var rechtesSystemNummer = "";
+    var rechtesSystemName = "";
     
     
-    if(urlParams.has('sys')){
-      	document.getElementById("sys1Beschreibung").innerHTML = urlParams.get('nr') + "<br>" + urlParams.get('sys');
+    if(urlParams.has('lsys')){
+      	document.getElementById("sys1Beschreibung").innerHTML = urlParams.get('lnr') + "<br>" + urlParams.get('lsys');
     }
     else{
     	//alert auskommentiert für entwicklung
@@ -108,45 +123,71 @@
     }
     
   
+  /*
+  * 
+  * 
+  * 
+  * 
+  * In: JSON String mit Informationen zu Parts und Ports
+  * Out: -
+  *   
+  */
     function init(jsonString){
-    	var text = JSON.parse(jsonString);
+		
+		//Umwandeln des JSON in Object
+    	var architekturObject = JSON.parse(jsonString);
     	
-    	//Regulärer Ausdruck zum finden von Nummern
-    	var regex = /\d+/g;
-    	var linkeMBGVNummer = document.getElementById('linkesSystem').innerText.match(regex);
-    	var rechteMBGVNummer = document.getElementById('rechtesSystem').innerText.match(regex);
+    	//leeren der Maps
+    	portsLinks = new Map();
+    	portsRechts = new Map();
     	
-    	if(linkeMBGVNummer){
-			if(!isNaN(linkeMBGVNummer))
-			{
-				linkeMBGVNummer = getPartname(linkeMBGVNummer[0]);
+    	//Überprüfen ob Ports oder Connectoren gezeichnet sind und wenn ja diese löschen
+    	if(document.getElementsByClassName("port").length > 0){
+			var anzahlPorts = document.getElementsByClassName("port").length;
+			for(let i = 0; i < anzahlPorts; i++){
+				document.getElementsByClassName("port")[0].remove();
 			}
 		}
-		if(rechteMBGVNummer){
-			if(!isNaN(rechteMBGVNummer))
-			{
-				rechteMBGVNummer = getPartname(rechteMBGVNummer[0]);
+		if(document.getElementsByClassName("svgConnectors").length > 0){
+			var anzahlPorts = document.getElementsByClassName("svgConnectors").length;
+			for(let i = 0; i < anzahlPorts; i++){
+				document.getElementsByClassName("svgConnectors")[0].remove();
 			}
 		}
-    	if(text[linkeMBGVNummer]){
-    		for(let i = 0; i < text[linkeMBGVNummer].length; i++){
-    			portHinzufuegenLinks(text[linkeMBGVNummer][i]);
+    	
+    	//Architekturkonforme Partbezeichnung
+    	var linkeMBGVNummer = "";
+    	var rechteMBGVNummer = "";
+    	
+    	//Wenn das linke System zugeordnet ist wird der Namenskonvention konform eine Bezeichnung gefunden
+    	//Dies geschieht in der Funktion portsAbfragen()
+    	if(linkesSystemNummer){
+			linkeMBGVNummer = getPartname(linkesSystemNummer);
+		}
+		
+		//Wenn das rechte System zugeordnet ist wird der Namenskonvention konform eine Bezeichnung gefunden
+		//Dies geschieht in der Funktion setSys2()
+		if(rechtesSystemNummer){
+			rechteMBGVNummer = getPartname(rechtesSystemNummer);
+		}
+		
+		//Wenn in dem Objekt 
+    	if(architekturObject[linkeMBGVNummer]){
+    		for(let i = 0; i < architekturObject[linkeMBGVNummer].length; i++){
+    			portHinzufuegenLinks("","",architekturObject[linkeMBGVNummer][i]);
     		}
-    		console.log("jo");
     	}
     	else{
-    		
-    		console.log("nö");
+    		console.log("Element nicht in dem JSON Objekt vorhanden");
     	}
-    	if(text[rechteMBGVNummer]){
-    		for(let i = 0; i < text[rechteMBGVNummer].length; i++){
-    			portHinzufuegenRechts(text[rechteMBGVNummer][i]);
+    	
+    	if(architekturObject[rechteMBGVNummer]){
+    		for(let i = 0; i < architekturObject[rechteMBGVNummer].length; i++){
+    			portHinzufuegenRechts("","",architekturObject[rechteMBGVNummer][i]);
     		}
-    		console.log("jo");
     	}
     	else{
-    		
-    		console.log("nö");
+    		console.log("Element nicht in dem JSON Objekt vorhanden");
     	}
     	
     }
@@ -163,15 +204,19 @@
     * Dieses Element wird in der Map gespeichert. Die Position des Element wird angepasst und 
     * die Eventlisteners gesetzt. Abschließend werden die Positionen aller SVG Linien geupdatet
     * 
-    * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX
+    * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
     *
     * Output: -
     * 
     */
-    function portHinzufuegenLinks(schnittstellenname){
+    function portHinzufuegenLinks(schnittstellenname, optionAuswahl, portObject){
     	if(!schnittstellenname){
     		schnittstellenname = "";
     	}
+    	if(typeof portObject === "object"){
+			optionAuswahl = portObject[Object.keys(portObject)[0]]['interfaceBlock'].split("_")[1];
+			schnittstellenname = portObject[Object.keys(portObject)[0]]['label'];
+		}
     	
     	var portNameLinks;
     	
@@ -213,7 +258,11 @@
                     '    </select>'+
                     '</div>'+
                     '</div>';
-        let html = $.parseHTML(htmlCode);
+        //let html = $.parseHTML(htmlCode);
+        if(optionAuswahl){
+			htmlCode = htmlCode.slice(0, htmlCode.indexOf(optionAuswahl)-1) + " selected=\"selected\">" + htmlCode.slice(htmlCode.indexOf(optionAuswahl))
+		}
+		let html = $.parseHTML(htmlCode);
         $("#portContainerLinks").append(html);
         
         //Map der PortsLinks updaten
@@ -269,16 +318,20 @@
      * Dieses Element wird in der Map gespeichert. Die Position des Element wird angepasst und 
      * die Eventlisteners gesetzt. Abschließend werden die Positionen aller SVG Linien geupdatet
      * 
-     * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX
+     * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
      *
      * Output: -
      * 
      */
-    function portHinzufuegenRechts(schnittstellenname){
+    function portHinzufuegenRechts(schnittstellenname, optionAuswahl, portObject){
     	
     	if(!schnittstellenname){
     		schnittstellenname = "";
     	}
+    	if(typeof portObject === "object"){
+			optionAuswahl = portObject[Object.keys(portObject)[0]]['interfaceBlock'].split("_")[1];
+			schnittstellenname = portObject[Object.keys(portObject)[0]]['label'];
+		}
     	
 		var portNameRechts;
     	
@@ -319,7 +372,11 @@
                     '    </select>'+
                     '</div>'+
                     '</div>';
-        let html = $.parseHTML(htmlCode);
+        //let html = $.parseHTML(htmlCode);
+        if(optionAuswahl){
+			htmlCode = htmlCode.slice(0, htmlCode.indexOf(optionAuswahl)-1) + " selected=\"selected\">" + htmlCode.slice(htmlCode.indexOf(optionAuswahl))
+		}
+		let html = $.parseHTML(htmlCode);
         $("#portContainerRechts").append(html);
 
         //Map der PortsLinks updaten
@@ -366,11 +423,13 @@
     
     
     function setSys2(sysName){
+		rechtesSystemNummer = sysName.split('<br>')[0];
+		rechtesSystemName = sysName.split('<br>')[1];		
         //Formatierung von Sys undefiniert auf Sys definert ändern:
         document.getElementById('rechtesSystem').classList.remove('sysNichtZugeordnet');
         document.getElementById('rechtesSystem').classList.add('sysZugeordnet');
 
-        let htmlCode =  '<div class="sysBeschreibung">'+sysName+
+        let htmlCode =  '<div id="sys2Beschreibung" class="sysBeschreibung">'+sysName+
                         '</div>'+
                         '<div id="portContainerRechts" class="portContainer">'+
                         '</div>'+
@@ -438,8 +497,11 @@
     
     
     function portsAbfragen(){
-        top.window.postMessage({getPorts: [urlParams.get('nr'),urlParams.get('sys')]}, '*');
-        console.log("ports");
+        top.window.postMessage({getPorts: [urlParams.get('lnr'),urlParams.get('lsys')]}, '*');
+        
+        //Setzen der Nummer und des Namens für das linke System
+        linkesSystemNummer = urlParams.get('lnr');
+        linkesSystemName = urlParams.get('lsys');
     }
     
     
@@ -478,12 +540,10 @@
             if(portsLinks.has(gezogenesElement.id)){
             	portsLinks.set(gezogenesElement.id, null);
             	gezogenesElement.remove();
-            	//gezogeneKinder.remove();
             }
             if(portsRechts.has(gezogenesElement.id)){
             	portsRechts.set(gezogenesElement.id, null);
             	gezogenesElement.remove();
-            	//gezogeneKinder.remove();
             }
         }
          
