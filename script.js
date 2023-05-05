@@ -51,8 +51,8 @@
 					"direction":"out",
 					"multiplicity":"1",
 					"connectors":{
-						"from":"PT_BGR_2472_PP_2500",
-						"to":"PT_BA_2500_PP_2472",
+						"from":"PT_HBGR_2130G_PP_2500_1",
+						"to":"PT_BA_2500_PP_2130G_1",
 						"name":"testConnector"
 					}
 				}
@@ -64,8 +64,8 @@
 					"direction":"out",
 					"multiplicity":"1",
 					"connectors":{
-						"from":"PT_BGR_2472_PP_2500",
-						"to":"PT_BA_2500_PP_2472",
+						"from":"PT_HBGR_2130G_PP_2500_2",
+						"to":"PT_BA_2500_PP_2130G_2",
 						"name":"testConnector2"
 					}
 				}
@@ -73,27 +73,27 @@
 		],
 		"PT_BA_2500":[
 			{
-				"PP_2472_1":{
+				"PP_2130G_1":{
 					"label":"rechtsTestLabel",
 					"interfaceBlock":"IB_Daten",
 					"direction":"in",
 					"multiplicity":"1",
 					"connectors":{
-						"from":"PT_BGR_2472_PP_2500",
-						"to":"PT_BA_2500_PP_2472",
+						"from":"PT_HBGR_2130G_PP_2500_1",
+						"to":"PT_BA_2500_PP_2130G_1",
 						"name":"testConnector"
 					}
 				}
 			},
 			{
-				"PP_2472_2":{
+				"PP_2130G_2":{
 					"label":"rechtsTestLabel2",
 					"interfaceBlock":"IB_Elektrisch",
 					"direction":"in",
 					"multiplicity":"1",
 					"connectors":{
-						"from":"PT_BGR_2472_PP_2500",
-						"to":"PT_BA_2500_PP_2472",
+						"from":"PT_HBGR_2130G_PP_2500_2",
+						"to":"PT_BA_2500_PP_2130G_2",
 						"name":"testConnector2"
 					}
 				}
@@ -104,10 +104,13 @@
     //Maps für die Speicherung der Ports HTML-Objekte auch für die spätere Positionierung
     var portsLinks = new Map();
     var portsRechts = new Map();
+    
     let svgArtboard = document.querySelector('#svgArtboard');
     let startPoint = svgArtboard.createSVGPoint();
     let endPoint = svgArtboard.createSVGPoint();
+    //Der gezogene Port
     let dragged = document.createElement("div");
+    //
     var linkesSystemNummer = new String("");
     var linkesSystemName = "";
     var rechtesSystemNummer = "";
@@ -171,7 +174,7 @@
 			rechteMBGVNummer = getPartname(rechtesSystemNummer);
 		}
 		
-		//Wenn in dem Objekt 
+		//Wenn in dem übergebenen Objekt die linke Part Nummer vorhanden ist alle Ports zeichnen lassen 
     	if(architekturObject[linkeMBGVNummer]){
     		for(let i = 0; i < architekturObject[linkeMBGVNummer].length; i++){
     			portHinzufuegenLinks("","",architekturObject[linkeMBGVNummer][i]);
@@ -181,6 +184,7 @@
     		console.log("Element nicht in dem JSON Objekt vorhanden");
     	}
     	
+    	//Wenn in dem übergebenen Objekt die rechte Part Nummer vorhanden ist alle Ports zeichnen lassen
     	if(architekturObject[rechteMBGVNummer]){
     		for(let i = 0; i < architekturObject[rechteMBGVNummer].length; i++){
     			portHinzufuegenRechts("","",architekturObject[rechteMBGVNummer][i]);
@@ -189,6 +193,12 @@
     	else{
     		console.log("Element nicht in dem JSON Objekt vorhanden");
     	}
+    	
+    	//Linien zeichnen lassen
+    	console.log("test");
+    	if(architekturObject[linkeMBGVNummer]){
+			
+		}
     	
     }
 
@@ -247,7 +257,7 @@
         //HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="' + portNameLinks + '" draggable="true" class="port portLinks">'+
                     '<div id="' + portBeschriftungNameLinks + '" class="portBeschriftung portBeschriftungLinks">'+
-                    '   <input type="text" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
+                    '   <input type="text" class="portlabel" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
                     '       <option>Elektrisch</option>'+
@@ -361,7 +371,7 @@
         //HTML-Code für Port und Portbeschriftung zusammensetzen und zur Oberflaeche hinzufuegen: 
         let htmlCode =  '<div id="' + portNameRechts + '" draggable="true" class="port portRechts" >'+
                     '<div id="' + portBeschriftungNameRechts + '" class="portBeschriftung portBeschriftungRechts">'+
-                    '   <input type="text" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
+                    '   <input type="text" class="portlabel" placeholder="Schnittstelle benennen!" value="'+ schnittstellenname +'">'+
                     '   <select>'+
                     '       <option>Daten</option>'+
                     '       <option>Elektrisch</option>'+
