@@ -126,7 +126,7 @@
     }
     
   
-  /*
+ /*
   * 
   * 
   * 
@@ -145,16 +145,16 @@
     	portsRechts = new Map();
     	
     	//Überprüfen ob Ports oder Connectoren gezeichnet sind und wenn ja diese löschen
-    	if(document.getElementsByClassName("port").length > 0){
-			var anzahlPorts = document.getElementsByClassName("port").length;
+    	if($(".port").length > 0){
+			var anzahlPorts = $(".port").length;
 			for(let i = 0; i < anzahlPorts; i++){
-				document.getElementsByClassName("port")[0].remove();
+				$(".port")[0].remove();
 			}
 		}
-		if(document.getElementsByClassName("svgConnectors").length > 0){
-			var anzahlPorts = document.getElementsByClassName("svgConnectors").length;
+		if($(".svgConnectors").length > 0){
+			var anzahlPorts = $(".svgConnectors").length;
 			for(let i = 0; i < anzahlPorts; i++){
-				document.getElementsByClassName("svgConnectors")[0].remove();
+				$(".svgConnectors")[0].remove();
 			}
 		}
     	
@@ -195,11 +195,75 @@
     	}
     	
     	//Linien zeichnen lassen
-    	console.log("test");
-    	if(architekturObject[linkeMBGVNummer]){
-			
+    	var arrayPortBezeichnungElemente = [];
+    	for(let i = 0; i < $(".portlinks").length; i++){
+			arrayPortBezeichnungElemente.push($(".portlinks")[i].children[0].children[0])
 		}
-    	
+		
+		for(let i = 0; i < $(".portrechts").length; i++){
+			arrayPortBezeichnungElemente.push($(".portrechts")[i].children[0].children[0])
+		}
+    	    	
+    	//Alle Bezeichnungen der Ports auf der linken Seite durchlaufen
+    	if(architekturObject[linkeMBGVNummer]){
+			for(let i = 0; i < architekturObject[linkeMBGVNummer].length; i++){
+				if(architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['connectors']['name']){
+					var linksPortlabel = architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['label'];
+					var rechtsPartName = architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['connectors']['to'].split("_PP")[0];
+					var rechtsPortName = "PP_" + architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['connectors']['to'].split("PP_")[1];
+					var rechtsPortLabel = "";
+					
+					//Wenn im Architekturobjekt das rechte Part vorhanden ist
+					if(architekturObject[rechtsPartName])
+					{
+						//Finden des Labels des gewünschten Ports welcher am rechten Part zu finden ist
+						rechtsPortLabel = architekturObject[rechtsPartName].find(element => element.hasOwnProperty(rechtsPortName))[rechtsPortName]['label'];
+					}
+				
+				
+					if(arrayPortBezeichnungElemente.find(element => element.value == linksPortlabel)){
+						var linksPortElement = arrayPortBezeichnungElemente.find(element => element.value == linksPortlabel).parentElement.parentElement;
+					}
+					if(arrayPortBezeichnungElemente.find(element => element.value == rechtsPortLabel)){
+						var rechtsPortElement = arrayPortBezeichnungElemente.find(element => element.value == rechtsPortLabel).parentElement.parentElement;
+					}
+				
+					//Wenn linker und rechter Port in dem HTML vorhanden sind
+					if(linksPortElement && rechtsPortElement){
+						var linksRect = linksPortElement.getClientRects()[0];
+						var rechtsRect = rechtsPortElement.getClientRects()[0];
+					
+					
+						var linksX = Math.round(((linksRect.right - linksRect.left) / 2 ) + linksRect.left);
+						var linksY = Math.round(((linksRect.bottom - linksRect.top) / 2 ) + linksRect.top);
+						var rechtsX = Math.round(((rechtsRect.right - rechtsRect.left) / 2 ) + rechtsRect.left);
+						var rechtsY = Math.round(((rechtsRect.bottom - rechtsRect.top) / 2 ) + rechtsRect.top);
+				
+				
+						let startPort = svgArtboard.createSVGPoint();
+    					let endPort = svgArtboard.createSVGPoint();
+				
+						startPort.x = linksX;
+    					startPort.y = linksY;
+    					endPort.x = rechtsX;
+    					endPort.y = rechtsY;
+    					let svgStartPort = startPort.matrixTransform(svgArtboard.getScreenCTM().inverse());
+    					let svgEndPort = endPort.matrixTransform(svgArtboard.getScreenCTM().inverse());
+				
+						var svgLinieName = linksPortElement.id + "_" + rechtsPortElement.id + "_Linie";
+						d3.select("#svgArtboard").append("line")
+            				.style("stroke", "black")
+            				.style("stroke-width", 3)
+            				.attr("class", "svgConnectors")
+            				.attr("id", svgLinieName)
+            				.attr("x1", svgStartPort.x)
+            				.attr("y1", svgStartPort.y)
+            				.attr("x2", svgEndPort.x)
+            				.attr("y2", svgEndPort.y);
+            		}
+            	}
+			}
+		}    	
     }
 
 
