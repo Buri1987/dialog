@@ -104,7 +104,7 @@
     //Maps für die Speicherung der Ports HTML-Objekte auch für die spätere Positionierung
     var portsLinks = new Map();
     var portsRechts = new Map();
-    
+    var portsVonBackend = new Map();    
     let svgArtboard = document.querySelector('#svgArtboard');
     let startPoint = svgArtboard.createSVGPoint();
     let endPoint = svgArtboard.createSVGPoint();
@@ -141,16 +141,33 @@
     	var architekturObject = JSON.parse(jsonString);
     	
     	//leeren der Maps
-    	portsLinks = new Map();
-    	portsRechts = new Map();
+    	//portsLinks = new Map();
+    	//portsRechts = new Map();
     	
-    	//Überprüfen ob Ports oder Connectoren gezeichnet sind und wenn ja diese löschen
-    	if($(".port").length > 0){
-			var anzahlPorts = $(".port").length;
-			for(let i = 0; i < anzahlPorts; i++){
-				$(".port")[0].remove();
+    	const iteratorPortsVonBackend = portsVonBackend[Symbol.iterator]();
+       	let vorhandenePortsVonBackend = new Array();
+       	
+       	for (const item of iteratorPortsVonBackend) {
+       		if(item[1]){
+       			vorhandenePortsVonBackend.push(item[0]);
+       		}
+       	}
+       	
+    	if(vorhandenePortsVonBackend.length > 0){
+			for(let i = 0; i < vorhandenePortsVonBackend.length; i++){
+				 if(portsLinks.get(vorhandenePortsVonBackend[i])){
+					portsLinks.get(vorhandenePortsVonBackend[i]).remove()
+            		portsLinks.set(vorhandenePortsVonBackend[i], null);
+            	}
+            	if(portsRechts.get(vorhandenePortsVonBackend[i])){
+					portsRechts.get(vorhandenePortsVonBackend[i]).remove()
+	            	portsRechts.set(vorhandenePortsVonBackend[i], null);
+            	}
 			}
 		}
+		
+		//Umschreiben
+    	//Überprüfen ob Ports oder Connectoren gezeichnet sind und wenn ja diese löschen
 		if($(".svgConnectors").length > 0){
 			var anzahlPorts = $(".svgConnectors").length;
 			for(let i = 0; i < anzahlPorts; i++){
@@ -207,6 +224,7 @@
     	//Alle Bezeichnungen der Ports auf der linken Seite durchlaufen
     	if(architekturObject[linkeMBGVNummer]){
 			for(let i = 0; i < architekturObject[linkeMBGVNummer].length; i++){
+				//Falls der Connectoreintrag des Ports einen Namen hat ist ein Connector vorhanden
 				if(architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['connectors']['name']){
 					var linksPortlabel = architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['label'];
 					var rechtsPartName = architekturObject[linkeMBGVNummer][i][Object.keys(architekturObject[linkeMBGVNummer][i])]['connectors']['to'].split("_PP")[0];
@@ -341,6 +359,11 @@
         
         //Map der PortsLinks updaten
         portsLinks.set(html[0].id,html[0]);
+        
+        //Map der portsVonBackend updaten
+        if(typeof portObject === "object"){
+        	portsVonBackend.set(html[0].id,portObject);
+        }
 
         //Ports gleichmaeßig verteilen:
        	updatePortsLinksPosition();
@@ -455,6 +478,11 @@
 
         //Map der PortsLinks updaten
         portsRechts.set(html[0].id,html[0]);
+        
+        //Map der portsVonBackend updaten
+        if(typeof portObject === "object"){
+        	portsVonBackend.set(html[0].id,portObject);
+        }
         
         //Ports gleichmaeßig verteilen:
         updatePortsRechtsPosition();
@@ -590,7 +618,7 @@
     
     trash.addEventListener("drop",function(ereignis){
          ereignis.preventDefault;
-         trash.classList.add("unsichtbar");
+         ereignis.target.classList.add("unsichtbar");
          ereignis.target.classList.remove("trashtarget");
          const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
          const gezogenesElement = document.getElementById(ausgeleseneID);
@@ -624,7 +652,7 @@
      });
    
     trash.addEventListener("dragenter", function(ereignis){
-    	trash.classList.add("trashtarget");
+    	ereignis.target.classList.add("trashtarget");
     });
      
      trash.addEventListener("dragleave", (event) => {
@@ -856,116 +884,5 @@
     
     function createJSON(){
 		var svgLines = document.getElementsByClassName("svgConnectors");
-
+		console.log(svgLines);
 	}
-
-/*{
-	"Partname":
-		{
-			"Portname":
-				{
-					"label":"label in Rhapsody";
-					"interfaceBlock":"interfaceBlockname",
-					"direction":"which direction",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"startpartname",
-								"to":"stoppartname",
-								"name":"connectorname"
-							}
-				}
-		}
-}
-
-
-your example
-
-{
-	"PT_HBGR_2620":
-		{
-			"Port123":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"StubInterfaceBlock",
-					"direction":"bidirectional",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_BGR_2441_portC",
-								"to":"PT_HBGR_2620_Port123",
-								"name":"PT_BGR_2441_PT_Verstellpropeller"
-							}
-				},
-			"Aufnahme":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"IB_Welle",
-					"direction":"in",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_BGR_2441_portB",
-								"to":"PT_HBGR_2620_Aufnahme",
-								"name":"PT_BGR_2441_PT_Verstellpropeller"
-							}
-				},
-			"Proxyport_5":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"StubInterfaceBlock",
-					"direction":"bidirectional",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_HBGR_2620_Proxyport_5",
-								"to":"PT_BGR_2441_portA",
-								"name":"PT_Verstellpropeller_PT_BGR_2441"
-							}
-				}
-		},
-	"PT_BGR_2441":
-		{
-			"portC":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"StubInterfaceBlock",
-					"direction":"bidirectional",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_BGR_2441_portC",
-								"to":"PT_HBGR_2620_Port123",
-								"name":"PT_BGR_2441_PT_Verstellpropeller"
-							}
-				},
-			"portA":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"IB_Welle",
-					"direction":"in",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_HBGR_2620_Proxyport_5",
-								"to":"PT_BGR_2441_portA",
-								"name":"PT_Verstellpropeller_PT_BGR_2441"
-							}
-				},
-			"portB":
-				{
-					"label":"label in Rhapsody",
-					"interfaceBlock":"IB_Welle",
-					"direction":"in",
-					"multiplicity":"1",
-					"connectors":
-							{
-								"from":"PT_BGR_2441_portB",
-								"to":"PT_HBGR_2620_Aufnahme",
-								"name":"PT_BGR_2441_PT_Verstellpropeller"
-							}
-				}
-		}
-}*/
-
-   
