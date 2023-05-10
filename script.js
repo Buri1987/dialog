@@ -115,6 +115,7 @@
     var linkesSystemName = "";
     var rechtesSystemNummer = "";
     var rechtesSystemName = "";
+    setTrashEventListeners();
     
     
     if(urlParams.has('lsys')){
@@ -140,40 +141,15 @@
 		//Umwandeln des JSON in Object
     	var architekturObject = JSON.parse(jsonString);
     	
-    	//leeren der Maps
-    	//portsLinks = new Map();
-    	//portsRechts = new Map();
-    	
     	const iteratorPortsVonBackend = portsVonBackend[Symbol.iterator]();
-       	let vorhandenePortsVonBackend = new Array();
        	
        	for (const item of iteratorPortsVonBackend) {
        		if(item[1]){
-       			vorhandenePortsVonBackend.push(item[0]);
+       			deleteLine(item[0]);
+       			deletePort(item[0]);
        		}
        	}
        	
-    	if(vorhandenePortsVonBackend.length > 0){
-			for(let i = 0; i < vorhandenePortsVonBackend.length; i++){
-				 if(portsLinks.get(vorhandenePortsVonBackend[i])){
-					portsLinks.get(vorhandenePortsVonBackend[i]).remove()
-            		portsLinks.set(vorhandenePortsVonBackend[i], null);
-            	}
-            	if(portsRechts.get(vorhandenePortsVonBackend[i])){
-					portsRechts.get(vorhandenePortsVonBackend[i]).remove()
-	            	portsRechts.set(vorhandenePortsVonBackend[i], null);
-            	}
-			}
-		}
-		
-		//Umschreiben
-    	//Überprüfen ob Ports oder Connectoren gezeichnet sind und wenn ja diese löschen
-		if($(".svgConnectors").length > 0){
-			var anzahlPorts = $(".svgConnectors").length;
-			for(let i = 0; i < anzahlPorts; i++){
-				$(".svgConnectors")[0].remove();
-			}
-		}
     	
     	//Architekturkonforme Partbezeichnung
     	var linkeMBGVNummer = "";
@@ -296,7 +272,7 @@
     * Dieses Element wird in der Map gespeichert. Die Position des Element wird angepasst und 
     * die Eventlisteners gesetzt. Abschließend werden die Positionen aller SVG Linien geupdatet
     * 
-    * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
+    * Input: Schnittstellenname nach MBSE Nomenklatur PP_2134, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
     *
     * Output: -
     * 
@@ -369,7 +345,7 @@
        	updatePortsLinksPosition();
         
       //Eventlisteners den Ports hinzufügen
-        setEventListeners(html);
+        setPortEventListeners(html);
       
       //Position der svg Lines updaten
         updateSVGLine();
@@ -415,7 +391,7 @@
      * Dieses Element wird in der Map gespeichert. Die Position des Element wird angepasst und 
      * die Eventlisteners gesetzt. Abschließend werden die Positionen aller SVG Linien geupdatet
      * 
-     * Input: Schnittstellenname nach MBSE Nomenklatur PP_XXXX, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
+     * Input: Schnittstellenname nach MBSE Nomenklatur PP_1234, InterfaceBlock für Auswahl des Dropdown Menüs, Port Objekt aus JSON von Architektur
      *
      * Output: -
      * 
@@ -488,7 +464,7 @@
         updatePortsRechtsPosition();
         
         //Eventlisteners den Ports hinzufügen
-        setEventListeners(html);
+        setPortEventListeners(html);
         
         //Position der svg Lines updaten
         updateSVGLine();
@@ -611,74 +587,100 @@
     /*                  PortsToTrash                    */
     /*                                                  */
     /****************************************************/
-    trash.addEventListener("dragover",function(ereignis){
-        ereignis.preventDefault();
-        ereignis.dataTransfer.dropEffect = "move";
-    });
-    
-    trash.addEventListener("drop",function(ereignis){
-         ereignis.preventDefault;
-         ereignis.target.classList.add("unsichtbar");
-         ereignis.target.classList.remove("trashtarget");
-         const ausgeleseneID = ereignis.dataTransfer.getData("text/plain");
-         const gezogenesElement = document.getElementById(ausgeleseneID);
-         //const ausgeleseneKinder = ausgeleseneID.slice(0, 4) + "Beschriftung" + ausgeleseneID.slice(4);
-         //const gezogeneKinder = document.getElementById(ausgeleseneKinder);
-         var svgLines = document.getElementsByClassName("svgConnectors");
-         var gezogenesElementID;
-         if(gezogenesElement){
-         	gezogenesElementID = gezogenesElement.id;
-         }
-         if(svgLines){
-        	 var svgLength = svgLines.length;
-          for(let i = svgLength-1; i > -1; i--){
-          	if(document.getElementById(svgLines[i].id).id.split("_").find(element => element == gezogenesElementID)){
-          		svgLines[i].remove();
-          	}
-          }
-         }
-         //Überprüfen ob der das gezogenen Element existiert und welcher Seite es angehört
-         if(gezogenesElement){
-            if(portsLinks.has(gezogenesElement.id)){
-            	portsLinks.set(gezogenesElement.id, null);
-            	gezogenesElement.remove();
+    function setTrashEventListeners(){
+    	trash.addEventListener("dragover",function(ereignis){
+	        ereignis.preventDefault();
+        	ereignis.dataTransfer.dropEffect = "move";
+    	});
+	    
+	    trash.addEventListener("drop",function(ereignis){
+         	ereignis.preventDefault;
+         	ereignis.target.classList.add("unsichtbar");
+         	ereignis.target.classList.remove("trashtarget");
+	
+         	if(dragged){
+			 	deleteLine(dragged.id);
+         	 	deletePort(dragged.id);
+         	}
+     	});
+	   
+	    trash.addEventListener("dragenter", function(ereignis){
+    		ereignis.target.classList.add("trashtarget");
+    	});
+	     
+     	trash.addEventListener("dragleave", (event) => {
+			// reset background of potential drop target when the draggable element leaves it
+			event.target.classList.remove("trashtarget");
+			console.log("dragleave");
+		});
+	}
+	
+	
+	
+	/*
+	* In der Funktion wird ein übergebener Port über die HTML Element ID ermitterlt und aus den Maps gelöscht
+	*
+	* In: HTML ID des Port Objects
+	* Out: -
+	*/
+	function deletePort(portID){
+		 //Überprüfen ob der Port existiert und welcher Seite es angehört zum Schluss löschen aus der Liste an Ports vom Backend
+         if(document.getElementById(portID)){
+            if(portsLinks.has(portID)){
+            	portsLinks.set(portID, null);
+            	document.getElementById(portID).remove();
+            	//port.remove();
             }
-            if(portsRechts.has(gezogenesElement.id)){
-            	portsRechts.set(gezogenesElement.id, null);
-            	gezogenesElement.remove();
+            if(portsRechts.has(portID)){
+            	portsRechts.set(portID, null);
+            	document.getElementById(portID).remove();
+            	//port.remove();
             }
-            if(portsVonBackend.has(gezogenesElement.id)){
-            	portsVonBackend.delete(gezogenesElement.id);
+            if(portsVonBackend.has(portID)){
+            	portsVonBackend.delete(portID);
             }
         }
-         
-     });
-   
-    trash.addEventListener("dragenter", function(ereignis){
-    	ereignis.target.classList.add("trashtarget");
-    });
-     
-     trash.addEventListener("dragleave", (event) => {
-		// reset background of potential drop target when the draggable element leaves it
-		event.target.classList.remove("trashtarget");
-		console.log("dragleave");
-	});
-
+	}
+	
+	
+	
+	/*
+	* In der Funktion wird ein übergebener Port über die HTML Element ID ermitterlt und dementsprechen die abhängigen Lines gelöscht
+	*
+	* In: HTML ID des Port Objects an dem die Linen hängen
+	* Out: -
+	*/
+	function deleteLine(portID){
+		var svgLines = document.getElementsByClassName("svgConnectors");
+		if(svgLines){
+			var svgLength = svgLines.length;
+			//Alle svgLines durchlaufen und die Line mit der portId in der id finden und löschen
+          	for(let i = svgLength-1; i > -1; i--){
+          		if(document.getElementById(svgLines[i].id).id.split("_").find(element => element == portID)){
+          			svgLines[i].remove();
+          		}
+          	}
+		}
+	}
     
     //Anteil Lennard SVG Linie zeichnen
     
 
-
-    function setEventListeners(html){
+	/**
+	 * Dem HTML Element werden Eventlisteners hinzugefügt, hier den Ports
+	 * 
+	 * In: Array mit HTML Element an 0ter Stelle
+	 * Out: -
+	 */
+    function setPortEventListeners(html){
         var trash = document.getElementById("trash");
         if(html[0].classList == "port portLinks"){
     		// events fired on the draggable target
     		var source = html[0];
+    		
     		source.addEventListener("drag", (event) => {
     			event.preventDefault();
-    			console.log(event);
     			drawDraggableSVGLine(event);
-    		  console.log("dragging");
     		});
 
     		source.addEventListener("dragstart", (event) => {
@@ -706,6 +708,7 @@
     		// events fired on the drop targets
     		var target = html[0];
     		console.log("add droptarget");
+    		
     		target.addEventListener("dragover",  (event) => {
     		    // prevent default to allow drop
     		    event.preventDefault();
@@ -778,7 +781,7 @@
     
 
     
-    /*
+    /**
     * Funktion zur Speichern des Connectornamens in der ID der Line
     * StartId_ZielID_Linie
     *
@@ -795,7 +798,13 @@
     }
 
     
-    
+    /**
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
     function drawDraggableSVGLine(event){
     	//Holen der Linie welche nur mit gezogenem Port verbunden ist
     	var svgLinie = document.getElementById(event.srcElement.id + '_Linie');
@@ -830,15 +839,16 @@
     	neueLinie.setAttribute("y1", Math.round(svgStartPoint.y));
     	neueLinie.setAttribute("x2", Math.round(svgEndPoint.x));
     	neueLinie.setAttribute("y2", Math.round(svgEndPoint.y));
-    	console.log(svgStartPoint);
-    	console.log(svgEndPoint);
-    	console.log(xCoord, yCoord);
-    	console.log(event.screenX,event.screenY);
     }
     
     
     
-    
+    /**
+	 * Funktion um Position der Lines nach zufügen eines neuen Port zu updaten
+	 * 
+	 * 
+	 * 
+	 */
     function updateSVGLine(){
     	var svgLines = document.getElementsByClassName("svgConnectors");
     	if(!svgLines){
@@ -885,7 +895,32 @@
     	}
     }
     
+    
+    /**
+	 * 
+	 * 
+	 * 
+	 */
     function createJSON(){
 		var svgLines = document.getElementsByClassName("svgConnectors");
+		var linesArray = new Array();
 		console.log(svgLines);
+		if(svgLines){
+			for(let i = 0; i < svgLines.length; i++){
+				var connector = Object.create(connectorObject);
+				connector.name =
+				connector.from = 
+				connector.to =  
+				 linesArray.push(connector);
+				 console.log(linesArray);
+			}
+		}
+			
+		
+		if(portsVonBackend.size > 0){
+			console.log("da");
+		}
+		else{
+			console.log("nicht da");
+		}
 	}
