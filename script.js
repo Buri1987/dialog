@@ -647,6 +647,9 @@
             	portsRechts.set(gezogenesElement.id, null);
             	gezogenesElement.remove();
             }
+            if(portsVonBackend.has(gezogenesElement.id)){
+            	portsVonBackend.delete(gezogenesElement.id);
+            }
         }
          
      });
