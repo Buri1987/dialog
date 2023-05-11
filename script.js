@@ -115,6 +115,15 @@
     var linkesSystemName = "";
     var rechtesSystemNummer = "";
     var rechtesSystemName = "";
+    var interfaceBlocks = new Map([
+		["Daten", "IB_Daten"],
+  		["Elektrisch", "IB_Daten"],
+  		["Mechanisch", "IB_Welle"],
+  		["Dampf", "IB_Dampf"],
+  		["Elektronenwolken", "IB_Elektronen"],
+  		["Siemens-Lufthaken", "IB_Siemens"],
+	]);
+    
     setTrashEventListeners();
     
     
@@ -900,18 +909,101 @@
 	 * 
 	 * 
 	 * 
+	 * In: -
+	 * Out: JSON mit den neu zu erstellenden Elementen
 	 */
     function createJSON(){
+		var backendPorts = new Array();
+		var backendPortsLinksAnzahl = 0;
+		var backendPortsRechtsAnzahl = 0;
+		
+		const iteratorPortsVonBackend = portsVonBackend[Symbol.iterator]();
+       	for (const item of iteratorPortsVonBackend) {
+       		if(item[1]){
+       			backendPorts.push(item[0]);
+       		}
+       	}
+       	for(let i = 0; i < backendPorts.length; i++){
+			   if(portsLinks.has(backendPorts[i])){
+				   backendPortsLinksAnzahl++;
+			   }
+			   else if(portsRechts.has(backendPorts[i])){
+				   backendPortsRechtsAnzahl++;
+			   }
+		}
+		
+		
+		var portsLinksOhneBackend = new Array();
+		var portsRechtsOhneBackend = new Array();
+		const iteratorPortsLinks = portsLinks[Symbol.iterator]();
+       	for (const item of iteratorPortsLinks) {
+       		if(item[1]){
+				if(!portsVonBackend.has(item[0])){
+					portsLinksOhneBackend.push(item[0]);
+				}       			
+       		}
+       	}
+       	
+       	const iteratorPortsRechts = portsRechts[Symbol.iterator]();
+       	for (const item of iteratorPortsRechts) {
+       		if(item[1]){
+				if(!portsVonBackend.has(item[0])){
+					portsRechtsOhneBackend.push(item[0]);
+				}       			
+       		}
+       	}
+       	
+       	var portsLinksManuell = new Map();
+       	for(let i = 0; i < portsLinksOhneBackend.length; i++){
+			   backendPortsLinksAnzahl++;
+			   var port = Object.create(portObject);
+			   var label = portsLinks.get(portsLinksOhneBackend[i]).children[0].children[0].value
+			   var interfaceBlock = portsLinks.get(portsLinksOhneBackend[i]).children[0].children[1].value
+			   interfaceBlock = interfaceBlocks.get(interfaceBlock)
+			   port.name = "PP_" + rechtesSystemNummer + "_" + backendPortsLinksAnzahl;
+			   port.direction = "InOut";
+			   port.interfaceBlock = interfaceBlock;
+			   port.label = label;
+			   portsLinksManuell.set(portsLinksOhneBackend[i],port);
+		}
+		
+		var portsRechtsManuell = new Map();
+       	for(let i = 0; i < portsRechtsOhneBackend.length; i++){
+			   backendPortsRechtsAnzahl++;
+			   var port = Object.create(portObject);
+			   var label = portsRechts.get(portsRechtsOhneBackend[i]).children[0].children[0].value
+			   var interfaceBlock = portsRechts.get(portsRechtsOhneBackend[i]).children[0].children[1].value
+			   interfaceBlock = interfaceBlocks.get(interfaceBlock)
+			   port.name = "PP_" + linkesSystemNummer + "_" + backendPortsRechtsAnzahl;
+			   port.direction = "InOut";
+			   port.interfaceBlock = interfaceBlock;
+			   port.label = label;
+			   portsRechtsManuell.set(portsRechtsOhneBackend[i],port);
+		}
+		
+		
 		var svgLines = document.getElementsByClassName("svgConnectors");
-		var linesArray = new Array();
+		var linesArray = new Map();
+		
 		console.log(svgLines);
 		if(svgLines){
+			
 			for(let i = 0; i < svgLines.length; i++){
 				var connector = Object.create(connectorObject);
-				connector.name =
-				connector.from = 
-				connector.to =  
-				 linesArray.push(connector);
+				if(portsLinksManuell.has(svgLines[i].id.split("_")[0])){
+					connector.from = portsLinksManuell.get(svgLines[i].id.split("_")[0])['name'];
+					connector.to = portsRechtsManuell.get(svgLines[i].id.split("_")[1])['name'];
+					connector.name = "testConnector";
+					linesArray.set(svgLines[i].id, connector);
+					console.log("neue Linie von links");
+				}
+				else if(portsRechtsManuell.has(svgLines[i].id.split("_")[0])){
+					connector.from = portsRechtsManuell.get(svgLines[i].id.split("_")[0])['name'];
+					connector.to = portsLinksManuell.get(svgLines[i].id.split("_")[1])['name'];
+					connector.name = "testConnector";
+					linesArray.set(svgLines[i].id, connector);
+					console.log("neue Linie von rechts");
+				}
 				 console.log(linesArray);
 			}
 		}

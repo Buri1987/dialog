@@ -254,3 +254,21 @@ body {
 .trashtarget {
 	background-color: red;
 }
+
+#cancel{
+	position: absolute;
+	left: 70%;
+	bottom: 2%;
+}
+
+#create{
+	position: absolute;
+	left: 90%;
+	bottom: 2%;
+}
+
+#send{
+	position: absolute;
+	left: 30%;
+	bottom: 2%;
+}
