@@ -983,31 +983,62 @@
 		
 		
 		var svgLines = document.getElementsByClassName("svgConnectors");
-		var linesArray = new Map();
+		var linesMap = new Map();
 		
-		console.log(svgLines);
 		if(svgLines){
 			
 			for(let i = 0; i < svgLines.length; i++){
 				var connector = Object.create(connectorObject);
 				if(portsLinksManuell.has(svgLines[i].id.split("_")[0])){
 					connector.from = portsLinksManuell.get(svgLines[i].id.split("_")[0])['name'];
-					connector.to = portsRechtsManuell.get(svgLines[i].id.split("_")[1])['name'];
+					if(portsRechtsManuell.get(svgLines[i].id.split("_")[1])){
+						connector.to = portsRechtsManuell.get(svgLines[i].id.split("_")[1])['name'];
+					}
+					else{
+						portsVonBackend.get(svgLines[i].id.split("_")[1])['name'];
+					}
 					connector.name = "testConnector";
-					linesArray.set(svgLines[i].id, connector);
+					linesMap.set(svgLines[i].id, connector);
 					console.log("neue Linie von links");
 				}
 				else if(portsRechtsManuell.has(svgLines[i].id.split("_")[0])){
 					connector.from = portsRechtsManuell.get(svgLines[i].id.split("_")[0])['name'];
-					connector.to = portsLinksManuell.get(svgLines[i].id.split("_")[1])['name'];
+					if(portsLinksManuell.get(svgLines[i].id.split("_")[1])){
+						connector.to = portsLinksManuell.get(svgLines[i].id.split("_")[1])['name'];
+					}
+					else{
+						portsVonBackend.get(svgLines[i].id.split("_")[1])['name'];
+					}
 					connector.name = "testConnector";
-					linesArray.set(svgLines[i].id, connector);
+					linesMap.set(svgLines[i].id, connector);
 					console.log("neue Linie von rechts");
 				}
-				 console.log(linesArray);
+				 console.log(linesMap);
 			}
 		}
-			
+		
+		//Push keine Lösung und = auch nicht
+		const iteratorLinesMap = linesMap[Symbol.iterator]();
+       	for (const item of iteratorLinesMap) {
+       		if(item[1]){
+				   if(portsLinksManuell.has(item[0].split("_")[0])){
+					   portsLinksManuell.get(item[0].split("_")[0]).connectors.push(item[1]);
+				   }
+				   else if(portsLinksManuell.has(item[0].split("_")[1])){
+					   portsLinksManuell.get(item[0].split("_")[1]).connectors = item[1];
+				   }
+				   else if(portsRechtsManuell.has(item[0].split("_")[0])){
+					   portsRechtsManuell.get(item[0].split("_")[0]).connectors = item[1];
+				   }
+				   else if(portsRechtsManuell.has(item[0].split("_")[1])){
+					   portsRechtsManuell.get(item[0].split("_")[1]).connectors = item[1];
+				   }
+				   else{
+					   alert("Der Konnektor hat keine Portzugehörigkeit.");
+				   }
+       		}
+       	}
+		
 		
 		if(portsVonBackend.size > 0){
 			console.log("da");
