@@ -29,9 +29,20 @@
 				<div>?</div>
 			</div>
 			<img id="trash" src="Images/Trash.png" class="unsichtbar">
+
 			<button id = "load" onclick="top.window.postMessage({name: 'Load from DB not yet availible'}, '*');">Bestehende Daten Laden</button>
 			<button id = "refresh" onclick="top.window.postMessage({name: 'refresh not yet availible'}, '*');">Ansicht aktualisieren</button>
 			<button id = "send" onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send	to Widget</button>
+
+//			<button id = "buttonload" onclick="top.window.postMessage({name: 'Load from DB not yet availible'}, '*');">Bestehende Daten Laden</button>
+//			<button id = "buttonrefresh" onclick="top.window.postMessage({name: 'refresh not yet availible'}, '*');">Ansicht aktualisieren</button>
+//			<button id = "buttonsend" onclick="top.window.postMessage({name: 'Daten vom Dialog'}, '*');">Send to Widget</button>
+			<div id="grid-fuer-canvas">
+				<div id="div-fuer-canvas">
+					<canvas id="canvasConnectoren"></canvas>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </body>
@@ -293,6 +304,28 @@ body {
 .trashtarget {
 	background-color: red;
 }
+
+#buttonload{
+	height: 30px;
+	right: 110;
+	bottom: 70;
+	position: absolute;
+}
+
+#buttonrefresh{
+	height: 30px;
+	right: 110;
+	bottom: 35;
+	position: absolute;
+}
+
+#buttonsend{
+	height: 20px;
+	right: 110;
+	bottom: 0;
+	position: absolute;
+}
+
 </style>
 <script type="text/javascript">
 
