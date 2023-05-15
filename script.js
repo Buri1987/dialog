@@ -50,11 +50,18 @@
 					"interfaceBlock":"IB_Daten",
 					"direction":"out",
 					"multiplicity":"1",
-					"connectors":{
-						"from":"PT_HBGR_2130G_PP_2500_1",
-						"to":"PT_BA_2500_PP_2130G_1",
-						"name":"testConnector"
-					}
+					"connectors":[
+						{
+							"from":"PT_HBGR_2130G_PP_2500_1",
+							"to":"PT_BA_2500_PP_2130G_1",
+							"name":"testConnector"
+						},
+						{
+							"from":"PT_HBGR_2130G_PP_2500_1",
+							"to":"PT_BA_2500_PP_2130G_2",
+							"name":"testConnector1.2"
+						}
+					]
 				}
 			},
 			{
@@ -63,11 +70,13 @@
 					"interfaceBlock":"IB_Elektrisch",
 					"direction":"out",
 					"multiplicity":"1",
-					"connectors":{
-						"from":"PT_HBGR_2130G_PP_2500_2",
-						"to":"PT_BA_2500_PP_2130G_2",
-						"name":"testConnector2"
-					}
+					"connectors":[
+						{
+							"from":"PT_HBGR_2130G_PP_2500_2",
+							"to":"PT_BA_2500_PP_2130G_2",
+							"name":"testConnector2"
+						}
+					]
 				}
 			}
 		],
@@ -78,11 +87,13 @@
 					"interfaceBlock":"IB_Daten",
 					"direction":"in",
 					"multiplicity":"1",
-					"connectors":{
-						"from":"PT_HBGR_2130G_PP_2500_1",
-						"to":"PT_BA_2500_PP_2130G_1",
-						"name":"testConnector"
-					}
+					"connectors":[
+						{
+							"from":"PT_HBGR_2130G_PP_2500_1",
+							"to":"PT_BA_2500_PP_2130G_1",
+							"name":"testConnector"
+						}
+					]
 				}
 			},
 			{
@@ -91,11 +102,18 @@
 					"interfaceBlock":"IB_Elektrisch",
 					"direction":"in",
 					"multiplicity":"1",
-					"connectors":{
-						"from":"PT_HBGR_2130G_PP_2500_2",
-						"to":"PT_BA_2500_PP_2130G_2",
-						"name":"testConnector2"
-					}
+					"connectors":[
+							{
+								"from":"PT_HBGR_2130G_PP_2500_1",
+								"to":"PT_BA_2500_PP_2130G_2",
+								"name":"testConnector1.2"
+							},
+							{
+								"from":"PT_HBGR_2130G_PP_2500_2",
+								"to":"PT_BA_2500_PP_2130G_2",
+								"name":"testConnector2"
+							}
+						]
 				}
 			}
 		]
