@@ -1037,29 +1037,40 @@
 			}
 		}
 		
-		//Push keine Lösung und = auch nicht
-		var connectorsLinksErsterEintragArray = new Array();
-		var connectorsLinksZweiterEintragArray = new Array();
-		var connectorsRechtsErsterEintragArray = new Array();
-		var connectorsRechtsZweiterEintragArray = new Array();
 		const iteratorLinesMap = linesMap[Symbol.iterator]();
        	for (const item of iteratorLinesMap) {
        		if(item[1]){
 				   if(portsLinksManuell.has(item[0].split("_")[0])){
-					   connectorsLinksErsterEintragArray.push(item[1])
-					   portsLinksManuell.get(item[0].split("_")[0]).connectors.push(item[1]);
+					   if(portsLinksManuell.get(item[0].split("_")[0]).connectors.length == 0){
+						   portsLinksManuell.get(item[0].split("_")[0]).connectors = [item[1]];
+					   }
+					   else{
+						   portsLinksManuell.get(item[0].split("_")[0])["connectors"].push(item[1]);
+					   }
 				   }
 				   else if(portsLinksManuell.has(item[0].split("_")[1])){
-					   connectorsLinksZweiterEintragArray.push(item[1])
-					   portsLinksManuell.get(item[0].split("_")[1]).connectors.push(item[1]);
+					   if(portsLinksManuell.get(item[0].split("_")[1]).connectors.length == 0){
+						   portsLinksManuell.get(item[0].split("_")[1]).connectors = [item[1]];
+					   }
+					   else{
+						   portsLinksManuell.get(item[0].split("_")[1])["connectors"].push(item[1]);
+					   }
 				   }
 				   else if(portsRechtsManuell.has(item[0].split("_")[0])){
-					   connectorsRechtsErsterEintragArray.push(item[1])
-					   portsRechtsManuell.get(item[0].split("_")[0]).connectors.push(item[1]);
+					   if(portsRechtsManuell.get(item[0].split("_")[0]).connectors.length == 0){
+						   portsRechtsManuell.get(item[0].split("_")[0]).connectors = [item[1]];
+					   }
+					   else{
+						   portsRechtsManuell.get(item[0].split("_")[0])["connectors"].push(item[1]);
+					   }
 				   }
 				   else if(portsRechtsManuell.has(item[0].split("_")[1])){
-					   connectorsRechtsZweiterEintragArray.push(item[1])
-					   portsRechtsManuell.get(item[0].split("_")[1]).connectors.push(item[1]);
+					   if(portsRechtsManuell.get(item[0].split("_")[1]).connectors.length == 0){
+						   portsRechtsManuell.get(item[0].split("_")[1]).connectors = [item[1]];
+					   }
+					   else{
+						   portsRechtsManuell.get(item[0].split("_")[1])["connectors"].push(item[1]);
+					   }
 				   }
 				   else{
 					   alert("Der Konnektor hat keine Portzugehörigkeit.");
@@ -1068,8 +1079,14 @@
        	}
 		
 		
-		if(portsVonBackend.size > 0){
-			console.log("da");
+		if(portsLinksManuell.size > 0){
+			console.log(portsLinksManuell);
+		}
+		else{
+			console.log("nicht da");
+		}
+		if(portsRechtsManuell.size > 0){
+			console.log(portsRechtsManuell);
 		}
 		else{
 			console.log("nicht da");
